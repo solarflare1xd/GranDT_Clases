@@ -11,6 +11,7 @@ namespace GranDT_Clases
         string Email { get; set; }
         DateOnly Nacimiento { get; set; }
         string Password { get; set; }
+        
 
     }
 }
