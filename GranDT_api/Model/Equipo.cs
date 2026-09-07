@@ -6,7 +6,7 @@ namespace GranDT_Clases
 {
     internal class Equipo
     {
-        string Nombre { get; set; }
+          string Nombre { get; set; }
         
     }
 }
