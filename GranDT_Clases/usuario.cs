@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace GranDT_Clases
+namespace Models
 {
     internal class Usuario
     {

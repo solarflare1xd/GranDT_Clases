@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace GranDT_Clases
+namespace Models;
 {
-    internal class Equipo
+    internal class Plantilla
     {
-          string Nombre { get; set; }
         
     }
 }

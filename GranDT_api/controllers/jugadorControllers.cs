@@ -1,4 +1,4 @@
-using BibliotecaApi.Models;
+using BibliotecaApi.Models; // Cambiado a plural para coincidir
 using BibliotecaApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,14 +22,14 @@ public class JugadorController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Libro> ObtenerPorId(int id)
+    public ActionResult<Jugador> ObtenerPorId(int id) // Corregido de Libro a Jugador
     {
-        var Jugador = service.ObtenerPorId(id);
+        var jugador = service.ObtenerPorId(id); // Corregido a minúscula o como prefieras
 
-        if (Jugador == null)
+        if (jugador == null)
             return NotFound();
 
-        return Ok(libro);
+        return Ok(jugador); // Corregido de libro a jugador
     }
 
     [HttpPost]
@@ -51,4 +51,3 @@ public class JugadorController : ControllerBase
         return NoContent();
     }
 }
-

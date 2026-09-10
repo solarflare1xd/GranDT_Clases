@@ -6,9 +6,9 @@ namespace BibliotecaApi.Services;
 
 public class JugadorService
 {
-    private readonly ILibroRepository repository;
+    private readonly IJugadorRepository repository;
 
-    public JugadorService(ILibroRepository repository)
+    public JugadorService(IJugadorRepository repository)
     {
         this.repository = repository;
     }
