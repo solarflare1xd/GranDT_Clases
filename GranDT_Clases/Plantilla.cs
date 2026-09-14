@@ -7,8 +7,8 @@ namespace GranDT_Clases
     internal class Plantilla
     {
         float Presupuesto { get; set; }
-        new Jugador[] Jugadores = new Jugador[10];
-        new Jugador[] Jugadores_sup = new Jugador[10];
+        new Futbolista[] Jugadores = new Futbolista[10];
+        new Futbolista[] Jugadores_sup = new Futbolista[10];
 
 
     }

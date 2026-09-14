@@ -7,6 +7,8 @@ namespace GranDT_Clases
     internal class Equipo
     {
         string Nombre { get; set; }
+        List<Futbolista> Jugadores { get; set; } = new List<Futbolista>();
+
         
     }
 }
