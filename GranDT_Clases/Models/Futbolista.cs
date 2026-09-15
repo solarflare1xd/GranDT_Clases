@@ -12,7 +12,7 @@
 
         public string Posicion { get; set; }
 
-        public List<Puntacion> HistorialPuntajes { get; set; } = new List<Puntacion>();
+        public List<Puntuacion> HistorialPuntajes { get; set; } = new List<Puntuacion>();
 
     }
 }

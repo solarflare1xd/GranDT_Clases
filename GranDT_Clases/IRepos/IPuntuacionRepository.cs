@@ -2,8 +2,8 @@ namespace GranDT_Clases.IRepos;
 
 public interface IPuntuacionRepository
 {
-    List<Puntacion> ObtenerTodos();
-    Puntacion? ObtenerPorId(string IdPuntacion);
-    Puntacion Agregar(Puntacion puntuacion);
-    bool Eliminar(string IdPuntacion);
+    List<Puntuacion> ObtenerTodos();
+    Puntuacion? ObtenerPorId(string IdPuntuacion);
+    Puntuacion Agregar(Puntuacion puntuacion);
+    bool Eliminar(string IdPuntuacion);
 }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GranDT_Clases.IRepos;
+
 namespace GranDT_Clases.Repositories;
 
 public class EquipoRepositoryMemoria : IEquipoRepository
