@@ -1,15 +1,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using GranDT_Clases.IRepos;
+
 namespace GranDT_Clases.Repositories;
 
-public class EquipoRepositoryMemoria : IEquipoRepository
+public class PlantillaRepositoryMemoria : IPlantillaRepository
 {
     private readonly List<Equipo> equipos = new();
 
     public List<Equipo> ObtenerTodos()
     {
         return equipos;
+    }
+
+    public Equipo? ObtenerPorfecha(int id)
+    {
+        return equipos.FirstOrDefault(e => e.IdEquipo == id);
     }
 
     public Equipo? ObtenerPorNombre(string nombre)
@@ -20,19 +26,17 @@ public class EquipoRepositoryMemoria : IEquipoRepository
     public Equipo Agregar(Equipo equipo)
     {
         equipos.Add(equipo);
-
         return equipo;
     }
 
-    public bool Eliminar(string nombre)
+    public bool Eliminar(int id)
     {
-        var equipo = ObtenerPorNombre(nombre);
+        var equipo = ObtenerPorId(id);
 
         if (equipo == null)
             return false;
 
         equipos.Remove(equipo);
-
         return true;
     }
 }
