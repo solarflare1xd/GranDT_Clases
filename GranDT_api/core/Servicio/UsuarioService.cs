@@ -1,57 +1,77 @@
 using GranDT_Clases;
-using GranDT_Clases.Services;
-using Microsoft.AspNetCore.Mvc;
+using GranDT_Clases.Repositories;
+using BCrypt.Net;
+using System.Text.RegularExpressions;
 
-namespace GranDT_api.Controllers;
+namespace GranDT_Clases.Services;
 
-[ApiController]
-[Route("api/[controller]")]
-public class UsuarioController : ControllerBase
+public class UsuarioService
 {
-    private readonly UsuarioService service;
+    private readonly IUsuarioRepository repository;
 
-    public UsuarioController(UsuarioService service)
+    public UsuarioService(IUsuarioRepository repository)
     {
-        this.service = service;
+        this.repository = repository;
     }
 
-    [HttpGet]
-    public ActionResult<List<Usuario>> ObtenerTodos()
+    public List<Usuario> ObtenerTodos()
     {
-        return service.ObtenerTodos();
+        return repository.ObtenerTodos();
     }
 
-    [HttpGet("{email}")]
-    public ActionResult<Usuario> ObtenerPorEmail(string email)
+    public Usuario? ObtenerPorEmailYPassword(string email, string password)
     {
-        var usuario = service.ObtenerPorEmail(email);
+        Usuario? usuario = repository.ObtenerPorEmail(email);
 
         if (usuario == null)
-        {
-            return NotFound();
-        }
+            return null;
+
+        if (!BCrypt.Net.BCrypt.Verify(password, usuario.Password))
+            return null;
 
         return usuario;
     }
 
-    [HttpPost]
-    public ActionResult<Usuario> Agregar(Usuario usuario)
+    public Usuario Agregar(Usuario usuario)
     {
-        var nuevoUsuario = service.Agregar(usuario);
+        if (!DatosCorrectos(usuario))
+            throw new Exception("Los datos del usuario no son correctos.");
 
-        return Ok(nuevoUsuario);
+        usuario.Password = BCrypt.Net.BCrypt.HashPassword(usuario.Password);
+
+        return repository.Agregar(usuario);
     }
 
-    [HttpDelete("{email}")]
-    public ActionResult Eliminar(string email)
+    public bool Eliminar(string email, string password)
     {
-        var eliminado = service.Eliminar(email);
+        Usuario? usuario = ObtenerPorEmailYPassword(email, password);
 
-        if (!eliminado)
-        {
-            return NotFound();
+        if (usuario == null)
+            return false;
+
+        return repository.Eliminar(email);
+    }
+
+            private bool DatosCorrectos(Usuario usuario)
+            {
+                if (string.IsNullOrWhiteSpace(usuario.Nombre))
+                    return false;
+
+                if (string.IsNullOrWhiteSpace(usuario.Apellido))
+                    return false;
+
+                if (string.IsNullOrWhiteSpace(usuario.Email))
+                    return false;
+
+                if (!Regex.IsMatch(usuario.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                    return false;
+
+                if (string.IsNullOrWhiteSpace(usuario.Password))
+                    return false;
+
+                if (usuario.Password.Length < 8)
+                    return false;
+
+                return true;
+            }
         }
-
-        return NoContent();
-    }
-}
