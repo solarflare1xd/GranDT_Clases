@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using GranDT_Clases;
 using GranDT_Clases.IRepos;
 
-namespace GranDT_Clases.Servicios;
+namespace GranDT_Clases.Servicios ;
 
 public class EquipoService
 {

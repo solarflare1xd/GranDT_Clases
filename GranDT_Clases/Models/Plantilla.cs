@@ -10,8 +10,8 @@ namespace GranDT_Clases
         public float Presupuesto { get; set; }
         public Futbolista[] Jugadores = new Futbolista[10];
         public Futbolista[] Jugadores_sup = new Futbolista[10];
-
+        
 
     }
 
-}
+}   
