@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using GranDT_Clases;
-using GranDT_api.Services;
+using GranDT_Clases.Servicios;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GranDT_api.Controllers;
@@ -25,7 +25,8 @@ public class EquipoController : ControllerBase
     [HttpGet("{nombre}")]
     public ActionResult<Equipo> ObtenerPorNombre(string nombre)
     {
-        var equipo = service.ObtenerPorId(nombre);
+        // Asegurate de que tu servicio tenga este método bien nombrado
+        var equipo = service.ObtenerPorNombre(nombre); 
 
         if (equipo == null)
             return NotFound();
@@ -36,9 +37,11 @@ public class EquipoController : ControllerBase
     [HttpPost]
     public ActionResult<Equipo> Agregar(Equipo equipo)
     {
+        // El repositorio ejecuta ExecuteScalar y le asigna el ID generado a la entidad
         var nuevoEquipo = service.Agregar(equipo);
 
-        return Ok(nuevoEquipo);
+        // Devuelve HTTP 201 (Created), la ruta para consultar el equipo y el objeto con su ID escalar
+        return CreatedAtAction(nameof(ObtenerPorNombre), new { nombre = nuevoEquipo.Nombre }, nuevoEquipo);
     }
 
     [HttpDelete("{nombre}")]

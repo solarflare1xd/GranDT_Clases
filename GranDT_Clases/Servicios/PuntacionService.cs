@@ -24,9 +24,9 @@ public class PuntuacionService
         return repository.ObtenerPorId(idPuntuacion);
     }
 
-    public Puntuacion Agregar(Puntuacion puntuacion)
+    public Puntuacion Agregar(Puntuacion puntuacion, int idJugador)
     {
-        return repository.Agregar(puntuacion);
+        return repository.Agregar(puntuacion, idJugador);
     }
 
     public bool Eliminar(string idPuntuacion)

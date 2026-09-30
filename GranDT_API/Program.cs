@@ -1,8 +1,29 @@
+using GranDT_Clases.IRepos;
+using GranDT_Clases.Models;
+using GranDT_Clases.Repositories;
+using GranDT_Clases.Servicios;
+using GranDT_Clases.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddControllers();
+builder.Services.AddScoped<IEquipoRepository, EquipoRepositoryDapper>();
+builder.Services.AddScoped<EquipoService>();
+builder.Services.AddScoped<IJugadorRepository, JugadorRepositoryDapper>();
+builder.Services.AddScoped<JugadorService>();
+builder.Services.AddScoped<IPlantillaRepository, PlantillaRepositoryDapper>();
+builder.Services.AddScoped<PlantillaService>();
+builder.Services.AddScoped<IPlantillaJugadorRepository, PlantillaJugadorRepositoryDapper>();
+builder.Services.AddScoped<PlantillaJugadorService>();
+builder.Services.AddScoped<IPosicionRepository, PosicionRepositoryDapper>();
+builder.Services.AddScoped<PosicionService>();
+builder.Services.AddScoped<IPuntuacionRepository, PuntuacionRepositoryMemoria>();
+builder.Services.AddScoped<PuntuacionService>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepositoryMemoria>();
+builder.Services.AddScoped<UsuarioService>();
 
 var app = builder.Build();
 
@@ -13,29 +34,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.MapControllers();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
