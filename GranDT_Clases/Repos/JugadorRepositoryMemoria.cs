@@ -1,38 +1,108 @@
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using Dapper;
+using Mundial2026_wazaaaaa.Clases_sql; // Tu namespace de conexión
+using GranDT_Clases;
 using GranDT_Clases.IRepos;
-namespace GranDT_Clases.Repositories;
 
-public class JugadorRepositoryMemoria : IJugadorRepository
+namespace GranDT_Clases.Repositories
 {
-    private readonly List<Futbolista> jugadores = new();
-
-    public List<Futbolista> ObtenerTodos()
+    public class JugadorRepositoryDapper : IJugadorRepository
     {
-        return jugadores;
-    }
+        private readonly Conexion _conexionBD;
 
-    public Futbolista? ObtenerPorId(int id)
-    {
-        return jugadores.FirstOrDefault(j => j.IdJugador == id);
-    }
+        public JugadorRepositoryDapper()
+        {
+            _conexionBD = new Conexion();
+        }
 
-    public Futbolista Agregar(Futbolista jugador)
-    {
-        jugadores.Add(jugador);
+        public List<Futbolista> ObtenerTodos()
+        {
+            var db = _conexionBD.establecerconexion();
+            
+            try
+            {
+                return db.Query<Futbolista>(
+                    "sp_ObtenerTodosJugadores",
+                    commandType: CommandType.StoredProcedure
+                ).ToList();
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
 
-        return jugador;
-    }
+        public Futbolista? ObtenerPorId(int id)
+        {
+            var db = _conexionBD.establecerconexion();
+            
+            try
+            {
+                return db.QueryFirstOrDefault<Futbolista>(
+                    "sp_ObtenerJugadorPorId",
+                    new { p_IdJugador = id },
+                    commandType: CommandType.StoredProcedure
+                );
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
 
-    public bool Eliminar(int id)
-    {
-        var jugador = ObtenerPorId(id);
+        public Futbolista Agregar(Futbolista jugador)
+        {
+            var db = _conexionBD.establecerconexion();
+            
+            try
+            {
+                // Mapeamos los parámetros, pasando el Enum como texto
+                var parametros = new
+                {
+                    p_Nombre = jugador.Nombre,
+                    p_Apellido = jugador.Apellido,
+                    p_Apodo = jugador.Apodo,
+                    p_Precio = jugador.Precio,
+                    p_FechaNacimiento = jugador.FechaNacimiento, // Soportado nativamente por MySqlConnector
+                    p_Posicion = jugador.Posicion.ToString() 
+                };
 
-        if (jugador == null)
-            return false;
+                // ExecuteScalar ejecuta el INSERT y nos devuelve el LAST_INSERT_ID()
+                int id = db.ExecuteScalar<int>(
+                    "sp_AgregarJugador",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                );
 
-        jugadores.Remove(jugador);
+                jugador.IdJugador = id;
+                return jugador;
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
 
-        return true;
+        public bool Eliminar(int id)
+        {
+            var db = _conexionBD.establecerconexion();
+            
+            try
+            {
+                int filasAfectadas = db.Execute(
+                    "sp_EliminarJugador",
+                    new { p_IdJugador = id },
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return filasAfectadas > 0;
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
     }
 }

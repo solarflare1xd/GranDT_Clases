@@ -1,38 +1,106 @@
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using Dapper;
+using Mundial2026_wazaaaaa.Clases_sql; // Tu namespace donde está la clase Conexion
+using GranDT_Clases;
 using GranDT_Clases.IRepos;
-namespace GranDT_Clases.Repositories;
 
-public class UsuarioRepositoryMemoria : IUsuarioRepository
+namespace GranDT_Clases.Repositories
 {
-    private readonly List<Usuario> usuarios = new();
-
-    public List<Usuario> ObtenerTodos()
+    public class UsuarioRepositoryMemoria : IUsuarioRepository
     {
-        return usuarios;
-    }
+        private readonly Conexion _conexionBD;
 
-    public Usuario? ObtenerPorEmail(string email)
-    {
-        return usuarios.FirstOrDefault(u => u.Email == email);
-    }
+        public UsuarioRepositoryMemoria()
+        {
+            _conexionBD = new Conexion();
+        }
 
-    public Usuario Agregar(Usuario usuario)
-    {
-        usuarios.Add(usuario);
+        public List<Usuario> ObtenerTodos()
+        {
+            var db = _conexionBD.establecerconexion();
+            
+            try
+            {
+                return db.Query<Usuario>(
+                    "sp_ObtenerTodosUsuarios",
+                    commandType: CommandType.StoredProcedure
+                ).ToList();
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
 
-        return usuario;
-    }
+        public Usuario? ObtenerPorEmail(string email)
+        {
+            var db = _conexionBD.establecerconexion();
+            
+            try
+            {
+                return db.QueryFirstOrDefault<Usuario>(
+                    "sp_ObtenerUsuarioPorEmail",
+                    new { p_Email = email },
+                    commandType: CommandType.StoredProcedure
+                );
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
 
-    public bool Eliminar(string email)
-    {
-        var usuario = ObtenerPorEmail(email);
+        public Usuario Agregar(Usuario usuario)
+        {
+            var db = _conexionBD.establecerconexion();
+            
+            try
+            {
+                string? idPlantilla = usuario.PlantillaUsuario != null ? usuario.PlantillaUsuario.IdPlantilla : null;
 
-        if (usuario == null)
-            return false;
+                db.Execute(
+                    "sp_AgregarUsuario",
+                    new 
+                    { 
+                        p_Email = usuario.Email,
+                        p_Nombre = usuario.Nombre,
+                        p_Apellido = usuario.Apellido,
+                        p_Nacimiento = usuario.Nacimiento,
+                        p_Password = usuario.Password,
+                        p_EsAdministrador = usuario.EsAdministrador,
+                        p_IdPlantilla = idPlantilla
+                    },
+                    commandType: CommandType.StoredProcedure
+                );
 
-        usuarios.Remove(usuario);
+                return usuario;
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
 
-        return true;
+        public bool Eliminar(string email)
+        {
+            var db = _conexionBD.establecerconexion();
+            
+            try
+            {
+                int filasAfectadas = db.Execute(
+                    "sp_EliminarUsuario",
+                    new { p_Email = email },
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return filasAfectadas > 0;
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
     }
 }

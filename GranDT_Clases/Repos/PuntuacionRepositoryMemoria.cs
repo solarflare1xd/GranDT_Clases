@@ -1,36 +1,105 @@
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using Dapper;
+using Mundial2026_wazaaaaa.Clases_sql; // Tu namespace de conexión
+using GranDT_Clases;
 using GranDT_Clases.IRepos;
 
-namespace GranDT_Clases.Repositories;
-
-public class PuntuacionRepositoryMemoria : IPuntuacionRepository
+namespace GranDT_Clases.Repositories
 {
-    private readonly List<Puntuacion> Puntuaciones = new();
-
-    public List<Puntuacion> ObtenerTodos()
+    // Mantengo el nombre que me pediste
+    public class PuntuacionRepositoryMemoria : IPuntuacionRepository
     {
-        return Puntuaciones;
-    }
+        private readonly Conexion _conexionBD;
 
-    public Puntuacion? ObtenerPorId(string id)
-    {
-        return Puntuaciones.FirstOrDefault(p => p.IdPuntuacion == id);
-    }
-    public Puntuacion Agregar(Puntuacion puntuacion)
-    {
-        Puntuaciones.Add(puntuacion);
-        return puntuacion;
-    }
+        public PuntuacionRepositoryMemoria()
+        {
+            _conexionBD = new Conexion();
+        }
 
-    public bool Eliminar(string id)
-    {
-        var puntuacion = ObtenerPorId(id);
+        public List<Puntuacion> ObtenerTodos()
+        {
+            var db = _conexionBD.establecerconexion();
+            
+            try
+            {
+                return db.Query<Puntuacion>(
+                    "sp_ObtenerTodasPuntuaciones",
+                    commandType: CommandType.StoredProcedure
+                ).ToList();
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
 
-        if (puntuacion == null)
-            return false;
+        public Puntuacion? ObtenerPorId(string id)
+        {
+            var db = _conexionBD.establecerconexion();
+            
+            try
+            {
+                return db.QueryFirstOrDefault<Puntuacion>(
+                    "sp_ObtenerPuntuacionPorId",
+                    new { p_IdPuntuacion = id },
+                    commandType: CommandType.StoredProcedure
+                );
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
 
-        Puntuaciones.Remove(puntuacion);
-        return true;
+        // ATENCIÓN ACÁ: 
+        // Como el objeto Puntuacion no tiene el IdJugador, tenés que pedirlo como parámetro en el método.
+        // Vas a tener que actualizar la interfaz IPuntuacionRepository para que coincida.
+        public Puntuacion Agregar(Puntuacion puntuacion, int idJugador)
+        {
+            var db = _conexionBD.establecerconexion();
+            
+            try
+            {
+                db.Execute(
+                    "sp_AgregarPuntuacion",
+                    new 
+                    { 
+                        p_IdPuntuacion = puntuacion.IdPuntuacion,
+                        p_Partido_date = puntuacion.Partido_date,
+                        p_Puntaje = puntuacion.Puntaje,
+                        p_IdJugador = idJugador // Lo sacamos del parámetro extra, no del objeto
+                    },
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return puntuacion;
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
+
+        public bool Eliminar(string id)
+        {
+            var db = _conexionBD.establecerconexion();
+            
+            try
+            {
+                int filasAfectadas = db.Execute(
+                    "sp_EliminarPuntuacion",
+                    new { p_IdPuntuacion = id },
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return filasAfectadas > 0;
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
     }
 }

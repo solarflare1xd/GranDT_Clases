@@ -1,42 +1,110 @@
-
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using Dapper;
+using Mundial2026_wazaaaaa.Clases_sql;
 using GranDT_Clases;
 using GranDT_Clases.IRepos;
 using GranDT_Clases.Models;
 
-namespace GranDT_Clases.Repositories;
-
-public class PlantillaJugadorRepositoryMemoria : IPlantillaJugadorRepository
+namespace GranDT_Clases.Repositories
 {
-    private readonly List<PlantillaJugador> plantillaJugadores = new();
-
-    public List<PlantillaJugador> ObtenerTodos()
+    public class PlantillaJugadorRepositoryDapper : IPlantillaJugadorRepository
     {
-        return plantillaJugadores;
-    }
+        private readonly Conexion _conexionBD;
 
-    public PlantillaJugador? ObtenerPorId(string idPlantilla, int idJugador)
-    {
-        return plantillaJugadores.FirstOrDefault(pj =>
-            pj.IdPlantilla == idPlantilla &&
-            pj.IdJugador == idJugador);
-    }
+        public PlantillaJugadorRepositoryDapper()
+        {
+            _conexionBD = new Conexion();
+        }
 
-    public PlantillaJugador Agregar(PlantillaJugador plantillaJugador)
-    {
-        plantillaJugadores.Add(plantillaJugador);
+        public List<PlantillaJugador> ObtenerTodos()
+        {
+            var db = _conexionBD.establecerconexion();
+            
+            try
+            {
+                return db.Query<PlantillaJugador>(
+                    "sp_ObtenerTodasPlantillaJugadores",
+                    commandType: CommandType.StoredProcedure
+                ).ToList();
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
 
-        return plantillaJugador;
-    }
+        public PlantillaJugador? ObtenerPorId(string idPlantilla, int idJugador)
+        {
+            var db = _conexionBD.establecerconexion();
+            
+            try
+            {
+                return db.QueryFirstOrDefault<PlantillaJugador>(
+                    "sp_ObtenerPlantillaJugadorPorId",
+                    new 
+                    { 
+                        p_IdPlantilla = idPlantilla, 
+                        p_IdJugador = idJugador 
+                    },
+                    commandType: CommandType.StoredProcedure
+                );
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
 
-    public bool Eliminar(string idPlantilla, int idJugador)
-    {
-        var plantillaJugador = ObtenerPorId(idPlantilla, idJugador);
+        public PlantillaJugador Agregar(PlantillaJugador plantillaJugador)
+        {
+            var db = _conexionBD.establecerconexion();
+            
+            try
+            {
+                db.Execute(
+                    "sp_AgregarPlantillaJugador",
+                    new 
+                    { 
+                        p_IdPlantilla = plantillaJugador.IdPlantilla,
+                        p_IdJugador = plantillaJugador.IdJugador,
+                        p_Numero = plantillaJugador.Numero,
+                        p_EsSuplente = plantillaJugador.EsSuplente
+                    },
+                    commandType: CommandType.StoredProcedure
+                );
 
-        if (plantillaJugador == null)
-            return false;
+                return plantillaJugador;
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
 
-        plantillaJugadores.Remove(plantillaJugador);
+        public bool Eliminar(string idPlantilla, int idJugador)
+        {
+            var db = _conexionBD.establecerconexion();
+            
+            try
+            {
+                int filasAfectadas = db.Execute(
+                    "sp_EliminarPlantillaJugador",
+                    new 
+                    { 
+                        p_IdPlantilla = idPlantilla, 
+                        p_IdJugador = idJugador 
+                    },
+                    commandType: CommandType.StoredProcedure
+                );
 
-        return true;
+                return filasAfectadas > 0;
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
     }
 }
