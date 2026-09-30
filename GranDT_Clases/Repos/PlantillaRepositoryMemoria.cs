@@ -8,11 +8,11 @@ using GranDT_Clases.IRepos;
 
 namespace GranDT_Clases.Repositories
 {
-    public class PlantillaRepositoryDapper : IPlantillaRepository
+    public class PlantillaRepositoryMemoria : IPlantillaRepository
     {
         private readonly Conexion _conexionBD;
 
-        public PlantillaRepositoryDapper()
+        public PlantillaRepositoryMemoria()
         {
             _conexionBD = new Conexion();
         }

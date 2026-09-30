@@ -8,11 +8,11 @@ using GranDT_Clases.IRepos;
 
 namespace GranDT_Clases.Repositories
 {
-    public class EquipoRepositoryDapper : IEquipoRepository
+    public class EquipoRepositoryMemoria : IEquipoRepository
     {
         private readonly Conexion _conexionBD;
 
-        public EquipoRepositoryDapper()
+        public EquipoRepositoryMemoria()
         {
             
             _conexionBD = new Conexion();

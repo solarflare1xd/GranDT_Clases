@@ -9,11 +9,11 @@ using GranDT_Clases.Models;
 
 namespace GranDT_Clases.Repositories
 {
-    public class PlantillaJugadorRepositoryDapper : IPlantillaJugadorRepository
+    public class PlantillaJugadorRepositoryMemoria: IPlantillaJugadorRepository
     {
         private readonly Conexion _conexionBD;
 
-        public PlantillaJugadorRepositoryDapper()
+        public PlantillaJugadorRepositoryMemoria()
         {
             _conexionBD = new Conexion();
         }
