@@ -17,7 +17,7 @@ namespace GranDT_api.Tests
             var equipos = service.ObtenerTodos();
 
             Assert.NotNull(equipos);
-            Assert.IsType<List<Equipo>>(equipos);
+            Assert.NotEmpty(equipos);
         }
 
         [Fact]

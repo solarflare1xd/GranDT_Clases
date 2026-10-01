@@ -16,7 +16,7 @@ namespace GranDT_api.Tests
             var puntuaciones = service.ObtenerTodos();
 
             Assert.NotNull(puntuaciones);
-            Assert.IsType<List<Puntuacion>>(puntuaciones);
+            Assert.NotEmpty(puntuaciones);
         }
 
         [Fact]

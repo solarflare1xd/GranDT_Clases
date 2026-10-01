@@ -17,7 +17,7 @@ namespace GranDT_api.Tests
             var plantillaJugadores = service.ObtenerTodos();
 
             Assert.NotNull(plantillaJugadores);
-            Assert.IsType<List<PlantillaJugador>>(plantillaJugadores);
+            Assert.NotEmpty(plantillaJugadores);
         }
 
         [Fact]

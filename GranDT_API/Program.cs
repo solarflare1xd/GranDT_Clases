@@ -34,20 +34,24 @@ builder.Services.AddScoped<UsuarioService>();
 
 var app = builder.Build();
 
-
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    
     
     app.MapScalarApiReference(options => 
     {
         options.Title = "API de GranDT";
         options.Theme = ScalarTheme.Default;
     });
+
+    // Agrega esta línea para redirigir la raíz a Scalar:
+    app.MapGet("/", () => Results.Redirect("/scalar/v1"));
+}
+else
+{
+    app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();

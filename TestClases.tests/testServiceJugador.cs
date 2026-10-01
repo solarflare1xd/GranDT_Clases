@@ -17,7 +17,7 @@ namespace GranDT_api.Tests
             var jugadores = service.ObtenerTodos();
 
             Assert.NotNull(jugadores);
-            Assert.IsType<List<Futbolista>>(jugadores);
+            Assert.NotEmpty(jugadores);
         }
 
         [Fact]

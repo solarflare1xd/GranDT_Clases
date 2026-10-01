@@ -16,7 +16,7 @@ namespace GranDT_api.Tests
             var usuarios = service.ObtenerTodos();
 
             Assert.NotNull(usuarios);
-            Assert.IsType<List<Usuario>>(usuarios);
+            Assert.NotEmpty(usuarios);
         }
 
         [Fact]
