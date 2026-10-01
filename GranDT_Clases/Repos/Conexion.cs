@@ -11,7 +11,8 @@ namespace Mundial2026_wazaaaaa.Clases_sql
         private static readonly string password = "";
         private static readonly string puerto = "3306";
 
-        private readonly string cadenaConexion = $"server={servidor};database={bd};uid={usuario};pwd={password};port={puerto};";
+        private readonly string cadenaConexion = Environment.GetEnvironmentVariable("GRANDT_TEST_CONNECTION_STRING")
+            ?? $"server={servidor};database={bd};uid={usuario};pwd={password};port={puerto};";
 
         
         private MySqlConnection conex;
