@@ -3,10 +3,12 @@ INSERT INTO Equipo (Nombre) VALUES
 ('Boca Juniors'),
 ('River Plate');
 
--- 2. JUGADOR (Asumiendo que Boca es IdEquipo 1 y River es IdEquipo 2)
-INSERT INTO Jugador (Nombre, Apellido, Apodo, Precio, FechaNacimiento, Posicion, IdEquipo) VALUES 
-('Sergio', 'Romero', 'Chiquito', 2500000.50, '1987-02-22', 'Arquero', 1),
-('Franco', 'Armani', 'Pulpo', 3100000.00, '1986-10-16', 'Arquero', 2);
+-- 2. JUGADOR 
+-- (Cambiamos la columna "Posicion" por "IdPosicion")
+-- (IdPosicion 1 corresponde a 'Arquero' según la tabla Posicion)
+INSERT INTO Jugador (Nombre, Apellido, Apodo, Precio, FechaNacimiento, IdPosicion, IdEquipo) VALUES 
+('Sergio', 'Romero', 'Chiquito', 2500000.50, '1987-02-22', 1, 1),
+('Franco', 'Armani', 'Pulpo', 3100000.00, '1986-10-16', 1, 2);
 
 -- 3. PLANTILLA
 INSERT INTO Plantilla (IdPlantilla, Presupuesto) VALUES 

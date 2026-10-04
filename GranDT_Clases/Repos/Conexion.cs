@@ -8,7 +8,7 @@ namespace Mundial2026_wazaaaaa.Clases_sql
         private static readonly string servidor = "localhost";
         private static readonly string bd = "GranDT";
         private static readonly string usuario = "pepito";
-        private static readonly string password = "";
+        private static readonly string password = "123456";
         private static readonly string puerto = "3306";
 
         private readonly string cadenaConexion = Environment.GetEnvironmentVariable("GRANDT_TEST_CONNECTION_STRING")
@@ -18,26 +18,21 @@ namespace Mundial2026_wazaaaaa.Clases_sql
         private MySqlConnection conex;
 
         public MySqlConnection establecerconexion()
-        {
-            try
-            {
-                if (conex == null)
-                {
-                    conex = new MySqlConnection(cadenaConexion);
-                }
+{
+    if (conex == null)
+    {
+        conex = new MySqlConnection(cadenaConexion);
+    }
 
-                if (conex.State != System.Data.ConnectionState.Open)
-                {
-                    conex.Open();
-                }
+    if (conex.State != System.Data.ConnectionState.Open)
+    {
+        // Si hay un error de usuario, contraseña o puerto, va a frenar acá
+        // y te va a mostrar exactamente qué está mal en la base de datos.
+        conex.Open();
+    }
 
-                return conex;
-            }
-            catch (MySqlException)
-            {
-                return null;
-            }
-        }
+    return conex;
+}
 
         public void cerrarConexion()
         {

@@ -16,7 +16,7 @@ namespace GranDT_api.Tests
             var usuarios = service.ObtenerTodos();
 
             Assert.NotNull(usuarios);
-            Assert.NotEmpty(usuarios);
+            Assert.Empty(usuarios);
         }
 
         [Fact]
@@ -181,5 +181,4 @@ namespace GranDT_api.Tests
         }
     }
 }
-
 

@@ -2,6 +2,8 @@
   <Folder Name="/GranDT_API/">
     <Project Path="GranDT_API/BibliotecaApi.csproj" />
   </Folder>
+  <Folder Name="/TestClases.tests/" />
+  <Folder Name="/TestClases.tests/Integration/" />
   <Project Path="GranDT_Clases/GranDT_Clases.csproj" />
   <Project Path="TestClases.tests/TestClases.tests.csproj" />
 </Solution>

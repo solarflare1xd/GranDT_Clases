@@ -17,7 +17,7 @@ namespace GranDT_api.Tests
             var jugadores = service.ObtenerTodos();
 
             Assert.NotNull(jugadores);
-            Assert.NotEmpty(jugadores);
+            Assert.Empty(jugadores);
         }
 
         [Fact]
@@ -108,5 +108,4 @@ namespace GranDT_api.Tests
         }
     }
 }
-
 

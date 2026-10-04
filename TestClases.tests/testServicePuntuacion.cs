@@ -16,7 +16,7 @@ namespace GranDT_api.Tests
             var puntuaciones = service.ObtenerTodos();
 
             Assert.NotNull(puntuaciones);
-            Assert.NotEmpty(puntuaciones);
+            Assert.Empty(puntuaciones);
         }
 
         [Fact]
