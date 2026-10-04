@@ -67,7 +67,7 @@ namespace GranDT_Clases.Repositories
                     new 
                     { 
                         p_IdPuntuacion = puntuacion.IdPuntuacion,
-                        p_Partido_date = puntuacion.Partido_date,
+                        p_Fecha = puntuacion.Fecha,
                         p_Puntaje = puntuacion.Puntaje,
                         p_IdJugador = idJugador // Lo sacamos del parámetro extra, no del objeto
                     },

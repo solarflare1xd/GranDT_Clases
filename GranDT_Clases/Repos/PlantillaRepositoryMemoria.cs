@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Dapper;
 using Mundial2026_wazaaaaa.Clases_sql; // Tu namespace de conexión
 using GranDT_Clases;
 using GranDT_Clases.IRepos;
+using System.Data;
 
 namespace GranDT_Clases.Repositories
 {
@@ -23,10 +23,11 @@ namespace GranDT_Clases.Repositories
             
             try
             {
-                return db.Query<Plantilla>(
+                var plantillas = db.Query<Plantilla>(
                     "sp_ObtenerTodasPlantillas",
                     commandType: CommandType.StoredProcedure
                 ).ToList();
+                return plantillas;
             }
             finally
             {
@@ -58,7 +59,7 @@ namespace GranDT_Clases.Repositories
             
             try
             {
-                db.Execute(
+                plantilla.Presupuesto = db.QuerySingle<decimal>(
                     "sp_AgregarPlantilla",
                     new 
                     { 
@@ -71,6 +72,88 @@ namespace GranDT_Clases.Repositories
                 // Como el Id es un string que ya viene en el objeto, 
                 // solo retornamos la misma entidad.
                 return plantilla;
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
+
+        public Plantilla? ObtenerPorUsuario(string email)
+        {
+            var db = _conexionBD.establecerconexion();
+
+            try
+            {
+                using var resultados = db.QueryMultiple(
+                    "sp_ObtenerPlantillaPorUsuario",
+                    new { p_Email = email },
+                    commandType: CommandType.StoredProcedure);
+
+                var plantilla = resultados.ReadFirstOrDefault<Plantilla>();
+                if (plantilla == null)
+                {
+                    return null;
+                }
+
+                var miembros = resultados.Read<PlantillaJugador, Futbolista, Posicion, PlantillaJugador>(
+                    (miembro, jugador, posicion) =>
+                    {
+                        miembro.IdJugador = jugador.IdJugador;
+                        jugador.Posicion = posicion;
+                        miembro.Futbolista = jugador;
+                        return miembro;
+                    },
+                    splitOn: "IdJugador,IdPosicion").ToList();
+
+                var puntuaciones = resultados.Read<Puntuacion>().ToList();
+                var jugadores = miembros
+                    .Where(miembro => miembro.Futbolista != null)
+                    .ToDictionary(miembro => miembro.IdJugador, miembro => miembro.Futbolista!);
+
+                foreach (var puntuacion in puntuaciones)
+                {
+                    if (jugadores.TryGetValue(puntuacion.IdJugador, out var jugador))
+                    {
+                        jugador.HistorialPuntajes.Add(puntuacion);
+                    }
+                }
+
+                foreach (var miembro in miembros)
+                {
+                    if (miembro.Futbolista == null)
+                    {
+                        continue;
+                    }
+
+                    if (miembro.EsSuplente)
+                    {
+                        plantilla.Jugadores_sup.Add(miembro.Futbolista);
+                    }
+                    else
+                    {
+                        plantilla.Jugadores.Add(miembro.Futbolista);
+                    }
+                }
+
+                return plantilla;
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
+
+        public ResultadoValidacionPlantilla? Validar(string idPlantilla)
+        {
+            var db = _conexionBD.establecerconexion();
+
+            try
+            {
+                return db.QueryFirstOrDefault<ResultadoValidacionPlantilla>(
+                    "sp_ValidarPlantilla",
+                    new { p_IdPlantilla = idPlantilla },
+                    commandType: CommandType.StoredProcedure);
             }
             finally
             {

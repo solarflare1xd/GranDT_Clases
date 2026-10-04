@@ -26,9 +26,9 @@ namespace GranDT_Clases.Repositories
             {
                 var equipoDictionary = new Dictionary<string, Equipo>();
 
-                db.Query<Equipo, Futbolista, Equipo>(
+                db.Query<Equipo, Futbolista, Posicion, Equipo>(
                     "sp_ObtenerTodosEquipos",
-                    (equipo, jugador) =>
+                    (equipo, jugador, posicion) =>
                     {
                         if (!equipoDictionary.TryGetValue(equipo.Nombre, out var equipoEntry))
                         {
@@ -39,12 +39,13 @@ namespace GranDT_Clases.Repositories
 
                         if (jugador != null && jugador.IdJugador != 0)
                         {
+                            jugador.Posicion = posicion;
                             equipoEntry.Jugadores.Add(jugador);
                         }
 
                         return equipoEntry;
                     },
-                    splitOn: "IdJugador",
+                    splitOn: "IdJugador,IdPosicion",
                         commandType: CommandType.StoredProcedure
                 );
 
@@ -64,9 +65,9 @@ namespace GranDT_Clases.Repositories
             {
                 Equipo? equipoResult = null;
 
-                db.Query<Equipo, Futbolista, Equipo>(
+                db.Query<Equipo, Futbolista, Posicion, Equipo>(
                     "sp_ObtenerEquipoPorNombre",
-                    (equipo, jugador) =>
+                    (equipo, jugador, posicion) =>
                     {
                         if (equipoResult == null)
                         {
@@ -76,13 +77,14 @@ namespace GranDT_Clases.Repositories
 
                         if (jugador != null && jugador.IdJugador != 0)
                         {
+                            jugador.Posicion = posicion;
                             equipoResult.Jugadores.Add(jugador);
                         }
 
                         return equipoResult;
                     },
                     new { p_Nombre = nombre },
-                    splitOn: "IdJugador",
+                    splitOn: "IdJugador,IdPosicion",
                     commandType: CommandType.StoredProcedure
                 );
 

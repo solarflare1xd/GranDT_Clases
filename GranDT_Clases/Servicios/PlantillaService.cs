@@ -23,6 +23,16 @@ public class PlantillaService
         return repository.ObtenerPorId(id);
     }
 
+    public Plantilla? ObtenerPorUsuario(string email)
+    {
+        return repository.ObtenerPorUsuario(email);
+    }
+
+    public ResultadoValidacionPlantilla? Validar(string id)
+    {
+        return repository.Validar(id);
+    }
+
     public Plantilla Agregar(Plantilla plantilla)
     {
         return repository.Agregar(plantilla);

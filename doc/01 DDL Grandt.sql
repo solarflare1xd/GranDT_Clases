@@ -21,7 +21,8 @@ CREATE TABLE Posicion (
     Nombre VARCHAR(30) NOT NULL UNIQUE,
     
     -- PK
-    CONSTRAINT PK_Posicion PRIMARY KEY (IdPosicion)
+    CONSTRAINT PK_Posicion PRIMARY KEY (IdPosicion),
+    CONSTRAINT CK_Posicion_Nombre CHECK (Nombre IN ('Arquero', 'Defensor', 'Mediocampista', 'Delantero'))
 );
 
 -- Insertar las posiciones básicas iniciales
@@ -35,7 +36,7 @@ CREATE TABLE Jugador (
     Nombre VARCHAR(50) NOT NULL,
     Apellido VARCHAR(50) NOT NULL,
     Apodo VARCHAR(50),
-    Precio FLOAT NOT NULL,
+    Precio DECIMAL(10, 2) NOT NULL,
     FechaNacimiento DATE NOT NULL,
     IdPosicion INT, 
     IdEquipo INT,
@@ -53,11 +54,26 @@ CREATE TABLE Jugador (
 -- =========================================
 CREATE TABLE Plantilla (
     IdPlantilla VARCHAR(50),
-    Presupuesto FLOAT NOT NULL,
+    Presupuesto DECIMAL(10, 2) NOT NULL,
     
     -- PK
     CONSTRAINT PK_Plantilla PRIMARY KEY (IdPlantilla)
 );
+
+-- Configuracion compartida por todas las plantillas.
+CREATE TABLE Configuracion (
+    IdConfiguracion TINYINT NOT NULL,
+    PresupuestoMaximo DECIMAL(10, 2) NOT NULL,
+    CantidadMaximaJugadores TINYINT UNSIGNED NOT NULL DEFAULT 20,
+
+    CONSTRAINT PK_Configuracion PRIMARY KEY (IdConfiguracion),
+    CONSTRAINT CK_Configuracion_Id CHECK (IdConfiguracion = 1),
+    CONSTRAINT CK_Configuracion_Presupuesto CHECK (PresupuestoMaximo >= 0),
+    CONSTRAINT CK_Configuracion_Cantidad CHECK (CantidadMaximaJugadores >= 11)
+);
+
+INSERT INTO Configuracion (IdConfiguracion, PresupuestoMaximo, CantidadMaximaJugadores)
+VALUES (1, 99999999.99, 20);
 
 -- =========================================
 -- 5. USUARIO
@@ -67,7 +83,7 @@ CREATE TABLE Usuario (
     Nombre VARCHAR(50) NOT NULL,
     Apellido VARCHAR(50) NOT NULL,
     Nacimiento DATE NOT NULL,
-    Password VARCHAR(255) NOT NULL,
+    Password CHAR(64) NOT NULL,
     EsAdministrador BIT NOT NULL DEFAULT 0,
     IdPlantilla VARCHAR(50) UNIQUE,
 
@@ -75,7 +91,7 @@ CREATE TABLE Usuario (
     CONSTRAINT PK_Usuario PRIMARY KEY (Email),
     
     -- FK (Conexiones)
-    CONSTRAINT FK_Usuario_Plantilla FOREIGN KEY (IdPlantilla) REFERENCES Plantilla(IdPlantilla) ON DELETE CASCADE
+    CONSTRAINT FK_Usuario_Plantilla FOREIGN KEY (IdPlantilla) REFERENCES Plantilla(IdPlantilla) ON DELETE SET NULL
 );
 
 -- =========================================
@@ -100,13 +116,17 @@ CREATE TABLE PlantillaJugador (
 -- =========================================
 CREATE TABLE Puntuacion (
     IdPuntuacion VARCHAR(50),
-    Partido_date DATE NOT NULL,
-    Puntaje INT NOT NULL,
+    Fecha TINYINT UNSIGNED NOT NULL DEFAULT 1,
+    Partido_date DATE NULL,
+    Puntaje DECIMAL(3, 1) NOT NULL,
     IdJugador INT NOT NULL,
 
     -- PK
     CONSTRAINT PK_Puntuacion PRIMARY KEY (IdPuntuacion),
     
     -- FK (Conexiones)
-    CONSTRAINT FK_Puntuacion_Jugador FOREIGN KEY (IdJugador) REFERENCES Jugador(IdJugador) ON DELETE CASCADE
+    CONSTRAINT FK_Puntuacion_Jugador FOREIGN KEY (IdJugador) REFERENCES Jugador(IdJugador) ON DELETE CASCADE,
+    CONSTRAINT UQ_Puntuacion_Jugador_Fecha UNIQUE (IdJugador, Fecha),
+    CONSTRAINT CK_Puntuacion_Fecha CHECK (Fecha BETWEEN 1 AND 49),
+    CONSTRAINT CK_Puntuacion_Puntaje CHECK (Puntaje BETWEEN 1 AND 10)
 );

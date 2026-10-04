@@ -32,6 +32,29 @@ public class PlantillaController : ControllerBase
         return Ok(plantilla);
     }
 
+    [HttpGet("usuario/{email}")]
+    public ActionResult<Plantilla> ObtenerPorUsuario(string email)
+    {
+        var plantilla = service.ObtenerPorUsuario(email);
+
+        if (plantilla == null)
+            return NotFound();
+
+        return Ok(plantilla);
+    }
+
+    [HttpGet("{id}/validacion")]
+    public ActionResult<ResultadoValidacionPlantilla> Validar(string id)
+    {
+        var resultado = service.Validar(id);
+
+        if (resultado == null)
+            return NotFound();
+
+        return Ok(resultado);
+    }
+
+
     [HttpPost]
     public ActionResult<Plantilla> Agregar(Plantilla plantilla)
     {

@@ -6,5 +6,6 @@ namespace GranDT_Clases
         public int IdJugador { get; set; }
         public int Numero { get; set; }
         public bool EsSuplente { get; set; }
+        public Futbolista? Futbolista { get; set; }
     }
 }

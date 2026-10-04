@@ -3,13 +3,12 @@ using GranDT_Clases.Models;
 using GranDT_Clases.Repositories;
 using GranDT_Clases.Servicios;
 using GranDT_Clases.Services;
-using Scalar.AspNetCore; // Agregamos el using de Scalar
-
 var builder = WebApplication.CreateBuilder(args);
 
 
-builder.Services.AddOpenApi();
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IEquipoRepository, EquipoRepositoryMemoria>();
 builder.Services.AddScoped<EquipoService>();
@@ -36,16 +35,11 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    
-    app.MapScalarApiReference(options => 
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
     {
-        options.Title = "API de GranDT";
-        options.Theme = ScalarTheme.Default;
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "GranDT API v1");
     });
-
-    // Agrega esta línea para redirigir la raíz a Scalar:
-    app.MapGet("/", () => Results.Redirect("/scalar/v1"));
 }
 else
 {

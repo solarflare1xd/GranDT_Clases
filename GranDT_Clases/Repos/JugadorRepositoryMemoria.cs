@@ -23,10 +23,31 @@ namespace GranDT_Clases.Repositories
             
             try
             {
-                return db.Query<Futbolista>(
+                var jugadores = new Dictionary<int, Futbolista>();
+
+                db.Query<Futbolista, Posicion, Puntuacion, Futbolista>(
                     "sp_ObtenerTodosJugadores",
+                    (jugador, posicion, puntuacion) =>
+                    {
+                        if (!jugadores.TryGetValue(jugador.IdJugador, out var existente))
+                        {
+                            existente = jugador;
+                            existente.Posicion = posicion;
+                            jugadores.Add(existente.IdJugador, existente);
+                        }
+
+                        if (puntuacion != null && !string.IsNullOrEmpty(puntuacion.IdPuntuacion))
+                        {
+                            existente.HistorialPuntajes.Add(puntuacion);
+                        }
+
+                        return existente;
+                    },
+                    splitOn: "IdPosicion,IdPuntuacion",
                     commandType: CommandType.StoredProcedure
-                ).ToList();
+                );
+
+                return jugadores.Values.ToList();
             }
             finally
             {
@@ -40,11 +61,31 @@ namespace GranDT_Clases.Repositories
             
             try
             {
-                return db.QueryFirstOrDefault<Futbolista>(
+                Futbolista? resultado = null;
+                var puntuaciones = new HashSet<string>();
+
+                db.Query<Futbolista, Posicion, Puntuacion, Futbolista>(
                     "sp_ObtenerJugadorPorId",
+                    (jugador, posicion, puntuacion) =>
+                    {
+                        resultado ??= jugador;
+                        resultado.Posicion = posicion;
+
+                        if (puntuacion != null
+                            && !string.IsNullOrEmpty(puntuacion.IdPuntuacion)
+                            && puntuaciones.Add(puntuacion.IdPuntuacion))
+                        {
+                            resultado.HistorialPuntajes.Add(puntuacion);
+                        }
+
+                        return resultado;
+                    },
                     new { p_IdJugador = id },
+                    splitOn: "IdPosicion,IdPuntuacion",
                     commandType: CommandType.StoredProcedure
                 );
+
+                return resultado;
             }
             finally
             {
@@ -58,20 +99,24 @@ namespace GranDT_Clases.Repositories
             
             try
             {
-                // Mapeamos los parámetros, pasando el Enum como texto
+                if (jugador.Posicion == null)
+                {
+                    throw new ArgumentException("El jugador debe tener una posición.", nameof(jugador));
+                }
+
                 var parametros = new
                 {
                     p_Nombre = jugador.Nombre,
                     p_Apellido = jugador.Apellido,
                     p_Apodo = jugador.Apodo,
                     p_Precio = jugador.Precio,
-                    p_FechaNacimiento = jugador.FechaNacimiento, // Soportado nativamente por MySqlConnector
-                    p_Posicion = jugador.Posicion.ToString() 
+                    p_FechaNacimiento = jugador.FechaNacimiento,
+                    p_IdPosicion = jugador.Posicion.IdPosicion,
+                    p_IdEquipo = jugador.IdEquipo
                 };
 
-                // ExecuteScalar ejecuta el INSERT y nos devuelve el LAST_INSERT_ID()
                 int id = db.ExecuteScalar<int>(
-                    "sp_AgregarJugador",
+                    "sp_AgregarJugadorConEquipo",
                     parametros,
                     commandType: CommandType.StoredProcedure
                 );
