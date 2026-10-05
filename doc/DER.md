@@ -52,11 +52,6 @@ erDiagram
         decimal Puntaje
         int IdJugador FK
     }
-    CONFIGURACION {
-        tinyint IdConfiguracion PK
-        decimal PresupuestoMaximo
-        tinyint CantidadMaximaJugadores
-    }
 ```
 
-Cada usuario puede tener como maximo una plantilla y cada plantilla como maximo un usuario. La tabla `PlantillaJugador` representa la relacion muchos-a-muchos entre plantillas y jugadores. La tabla `Configuracion` guarda el presupuesto compartido y el limite actual de jugadores por plantilla.
+Cada usuario puede tener como maximo una plantilla y cada plantilla como maximo un usuario. La tabla `PlantillaJugador` representa la relacion muchos-a-muchos entre plantillas y jugadores. Todas las plantillas usan un presupuesto fijo de $99.999.999,99 y un maximo fijo de 20 jugadores.

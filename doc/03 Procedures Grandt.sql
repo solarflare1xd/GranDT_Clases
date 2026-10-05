@@ -133,9 +133,8 @@ END //
 -- Obtener todas las plantillas
 CREATE PROCEDURE sp_ObtenerTodasPlantillas()
 BEGIN
-    SELECT p.IdPlantilla, c.PresupuestoMaximo AS Presupuesto, c.CantidadMaximaJugadores
-    FROM Plantilla p
-    INNER JOIN Configuracion c ON c.IdConfiguracion = 1;
+    SELECT p.IdPlantilla, p.Presupuesto, 20 AS CantidadMaximaJugadores
+    FROM Plantilla p;
 END //
 
 -- Obtener plantilla por Id
@@ -143,9 +142,8 @@ CREATE PROCEDURE sp_ObtenerPlantillaPorId(
     IN p_IdPlantilla VARCHAR(50)
 )
 BEGIN
-    SELECT p.IdPlantilla, c.PresupuestoMaximo AS Presupuesto, c.CantidadMaximaJugadores
+    SELECT p.IdPlantilla, p.Presupuesto, 20 AS CantidadMaximaJugadores
     FROM Plantilla p
-    INNER JOIN Configuracion c ON c.IdConfiguracion = 1
     WHERE p.IdPlantilla = p_IdPlantilla;
 END //
 
@@ -155,43 +153,11 @@ CREATE PROCEDURE sp_AgregarPlantilla(
     IN p_Presupuesto DECIMAL(10, 2)
 )
 BEGIN
-    INSERT INTO Plantilla (IdPlantilla, Presupuesto) 
-    SELECT p_IdPlantilla, PresupuestoMaximo
-    FROM Configuracion
-    WHERE IdConfiguracion = 1;
+    -- p_Presupuesto se conserva por compatibilidad; el presupuesto es fijo.
+    INSERT INTO Plantilla (IdPlantilla, Presupuesto)
+    VALUES (p_IdPlantilla, 99999999.99);
 
     SELECT Presupuesto FROM Plantilla WHERE IdPlantilla = p_IdPlantilla;
-END //
-
-CREATE PROCEDURE sp_ActualizarConfiguracion(
-    IN p_PresupuestoMaximo DECIMAL(10, 2),
-    IN p_CantidadMaximaJugadores TINYINT UNSIGNED
-)
-BEGIN
-    IF p_PresupuestoMaximo < 0 OR p_CantidadMaximaJugadores < 11 THEN
-        SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'La configuracion requiere presupuesto no negativo y al menos 11 jugadores.';
-    END IF;
-
-    IF EXISTS (
-        SELECT 1
-        FROM PlantillaJugador pj
-        INNER JOIN Jugador j ON j.IdJugador = pj.IdJugador
-        GROUP BY pj.IdPlantilla
-        HAVING SUM(j.Precio) > p_PresupuestoMaximo
-            OR COUNT(*) > p_CantidadMaximaJugadores
-    ) THEN
-        SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'La nueva configuracion no es compatible con las plantillas existentes.';
-    END IF;
-
-    UPDATE Configuracion
-    SET PresupuestoMaximo = p_PresupuestoMaximo,
-        CantidadMaximaJugadores = p_CantidadMaximaJugadores
-    WHERE IdConfiguracion = 1;
-
-    UPDATE Plantilla
-    SET Presupuesto = p_PresupuestoMaximo;
 END //
 
 CREATE PROCEDURE sp_ValidarPlantilla(
@@ -200,39 +166,50 @@ CREATE PROCEDURE sp_ValidarPlantilla(
 BEGIN
     DECLARE v_presupuesto DECIMAL(10, 2);
     DECLARE v_max_jugadores INT;
+    DECLARE v_gasto DECIMAL(12, 2);
+    DECLARE v_cantidad INT;
+    DECLARE v_arqueros INT;
+    DECLARE v_defensores INT;
+    DECLARE v_mediocampistas INT;
+    DECLARE v_delanteros INT;
 
-    SELECT PresupuestoMaximo, CantidadMaximaJugadores
-    INTO v_presupuesto, v_max_jugadores
-    FROM Configuracion
-    WHERE IdConfiguracion = 1;
+    SET v_presupuesto = 99999999.99;
+    SET v_max_jugadores = 20;
+
+    IF NOT EXISTS (SELECT 1 FROM Plantilla WHERE IdPlantilla = p_IdPlantilla) THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'La plantilla no existe.';
+    END IF;
 
     SELECT
-        p.IdPlantilla,
-        COALESCE(SUM(j.Precio), 0) <= v_presupuesto AS PresupuestoValido,
-        COUNT(pj.IdJugador) <= v_max_jugadores AS CantidadValida,
-        COALESCE(SUM(CASE WHEN pj.EsSuplente = 0 AND pos.Nombre = 'Arquero' THEN 1 ELSE 0 END), 0) = 1
-            AND COALESCE(SUM(CASE WHEN pj.EsSuplente = 0 AND pos.Nombre = 'Defensor' THEN 1 ELSE 0 END), 0) = 4
-            AND COALESCE(SUM(CASE WHEN pj.EsSuplente = 0 AND pos.Nombre = 'Mediocampista' THEN 1 ELSE 0 END), 0) = 4
-            AND COALESCE(SUM(CASE WHEN pj.EsSuplente = 0 AND pos.Nombre = 'Delantero' THEN 1 ELSE 0 END), 0) = 2 AS FormacionValida,
-        COALESCE(SUM(j.Precio), 0) AS Gasto,
-        v_presupuesto - COALESCE(SUM(j.Precio), 0) AS PresupuestoDisponible,
-        COUNT(pj.IdJugador) AS CantidadJugadores
+        COALESCE(SUM(j.Precio), 0),
+        COUNT(pj.IdJugador),
+        COALESCE(SUM(pj.EsSuplente = 0 AND pos.Nombre = 'Arquero'), 0),
+        COALESCE(SUM(pj.EsSuplente = 0 AND pos.Nombre = 'Defensor'), 0),
+        COALESCE(SUM(pj.EsSuplente = 0 AND pos.Nombre = 'Mediocampista'), 0),
+        COALESCE(SUM(pj.EsSuplente = 0 AND pos.Nombre = 'Delantero'), 0)
+    INTO v_gasto, v_cantidad, v_arqueros, v_defensores, v_mediocampistas, v_delanteros
     FROM Plantilla p
     LEFT JOIN PlantillaJugador pj ON pj.IdPlantilla = p.IdPlantilla
     LEFT JOIN Jugador j ON j.IdJugador = pj.IdJugador
     LEFT JOIN Posicion pos ON pos.IdPosicion = j.IdPosicion
-    WHERE p.IdPlantilla = p_IdPlantilla
-    GROUP BY p.IdPlantilla;
+    WHERE p.IdPlantilla = p_IdPlantilla;
+
+    IF v_gasto > v_presupuesto OR v_cantidad > v_max_jugadores
+        OR v_arqueros <> 1 OR v_defensores <> 4
+        OR v_mediocampistas <> 4 OR v_delanteros <> 2 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'La plantilla no cumple el presupuesto, el maximo de jugadores o la formacion titular.';
+    END IF;
 END //
 
 CREATE PROCEDURE sp_ObtenerPlantillaPorUsuario(
     IN p_Email VARCHAR(100)
 )
 BEGIN
-    SELECT p.IdPlantilla, c.PresupuestoMaximo AS Presupuesto, c.CantidadMaximaJugadores
+    SELECT p.IdPlantilla, p.Presupuesto, 20 AS CantidadMaximaJugadores
     FROM Usuario u
     INNER JOIN Plantilla p ON p.IdPlantilla = u.IdPlantilla
-    INNER JOIN Configuracion c ON c.IdConfiguracion = 1
     WHERE u.Email = p_Email;
 
     SELECT
@@ -293,6 +270,46 @@ CREATE PROCEDURE sp_AgregarPlantillaJugador(
 BEGIN
     INSERT INTO PlantillaJugador (IdPlantilla, IdJugador, Numero, EsSuplente) 
     VALUES (p_IdPlantilla, p_IdJugador, p_Numero, p_EsSuplente);
+END //
+
+CREATE PROCEDURE sp_IntercambiarTitularSuplente(
+    IN p_IdPlantilla VARCHAR(50),
+    IN p_IdJugadorTitular INT,
+    IN p_IdJugadorSuplente INT
+)
+BEGIN
+    DECLARE v_pareja_valida INT;
+
+    SELECT COUNT(*)
+    INTO v_pareja_valida
+    FROM PlantillaJugador titular
+    INNER JOIN Jugador jugador_titular ON jugador_titular.IdJugador = titular.IdJugador
+    INNER JOIN PlantillaJugador suplente
+        ON suplente.IdPlantilla = titular.IdPlantilla
+    INNER JOIN Jugador jugador_suplente ON jugador_suplente.IdJugador = suplente.IdJugador
+    WHERE titular.IdPlantilla = p_IdPlantilla
+      AND titular.IdJugador = p_IdJugadorTitular
+      AND titular.EsSuplente = 0
+      AND suplente.IdJugador = p_IdJugadorSuplente
+      AND suplente.EsSuplente = 1
+      AND jugador_titular.IdPosicion = jugador_suplente.IdPosicion;
+
+    IF v_pareja_valida <> 1 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Se requiere un titular y un suplente existentes de la misma posicion.';
+    END IF;
+
+    UPDATE PlantillaJugador
+    SET EsSuplente = 1
+    WHERE IdPlantilla = p_IdPlantilla
+      AND IdJugador = p_IdJugadorTitular;
+
+    UPDATE PlantillaJugador
+    SET EsSuplente = 0
+    WHERE IdPlantilla = p_IdPlantilla
+      AND IdJugador = p_IdJugadorSuplente;
+
+    CALL sp_ValidarPlantilla(p_IdPlantilla);
 END //
 
 -- Eliminar un jugador de una plantilla

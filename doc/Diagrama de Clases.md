@@ -18,11 +18,12 @@ direction LR
         +int CantidadMaximaJugadores
         +List~Futbolista~ Jugadores
         +List~Futbolista~ Jugadores_sup
-        +decimal Gasto
-        +decimal PresupuestoDisponible
-        +bool FormacionValida
-        +bool EsValida
-        +decimal PuntajeFecha(fecha)
+    }
+    class PlantillaService {
+        +CrearCompleta(id, integrantes)
+        +ObtenerGasto(plantilla)
+        +ObtenerPresupuestoDisponible(plantilla)
+        +PuntajeFecha(plantilla, fecha)
     }
     class Futbolista {
         +int IdJugador

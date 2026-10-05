@@ -7,5 +7,8 @@ public interface IPlantillaRepository
     Plantilla Agregar(Plantilla plantilla);
     bool Eliminar(string IdPlantilla);
     Plantilla? ObtenerPorUsuario(string email) => null;
-    ResultadoValidacionPlantilla? Validar(string idPlantilla) => null;
+    Plantilla CrearCompleta(Plantilla plantilla, IReadOnlyCollection<PlantillaJugador> integrantes)
+    {
+        throw new NotSupportedException("El repositorio no permite crear plantillas completas.");
+    }
 }

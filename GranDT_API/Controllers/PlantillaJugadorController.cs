@@ -51,6 +51,29 @@ public class PlantillaJugadorController : ControllerBase
             nuevoRegistro);
     }
 
+    [HttpPatch("{idPlantilla}/intercambiar-titulares")]
+    public IActionResult IntercambiarTitularSuplente(
+        string idPlantilla,
+        IntercambiarTitularSuplenteRequest request)
+    {
+        try
+        {
+            if (!service.IntercambiarTitularSuplente(
+                    idPlantilla,
+                    request.IdJugadorTitular,
+                    request.IdJugadorSuplente))
+            {
+                return NotFound();
+            }
+
+            return NoContent();
+        }
+        catch (ArgumentException error)
+        {
+            return BadRequest(new { error = error.Message });
+        }
+    }
+
     [HttpDelete("{idPlantilla}/{idJugador:int}")]
     public IActionResult Eliminar(string idPlantilla, int idJugador)
     {

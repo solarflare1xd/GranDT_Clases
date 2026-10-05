@@ -21,7 +21,9 @@ builder.Services.AddScoped<IPlantillaRepository, PlantillaRepositoryMemoria>();
 builder.Services.AddScoped<PlantillaService>();
 
 builder.Services.AddScoped<IPlantillaJugadorRepository, PlantillaJugadorRepositoryMemoria>();
-builder.Services.AddScoped<PlantillaJugadorService>();
+builder.Services.AddScoped<PlantillaJugadorService>(services => new PlantillaJugadorService(
+    services.GetRequiredService<IPlantillaJugadorRepository>(),
+    services.GetRequiredService<IJugadorRepository>()));
 
 builder.Services.AddScoped<IPosicionRepository, PosicionRepositoryMemoria>();
 builder.Services.AddScoped<PosicionService>();

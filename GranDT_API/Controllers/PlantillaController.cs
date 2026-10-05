@@ -44,25 +44,25 @@ public class PlantillaController : ControllerBase
         return Ok(plantilla);
     }
 
-    [HttpGet("{id}/validacion")]
-    public ActionResult<ResultadoValidacionPlantilla> Validar(string id)
-    {
-        var resultado = service.Validar(id);
-
-        if (resultado == null)
-            return NotFound();
-
-        return Ok(resultado);
-    }
-
-
     [HttpPost]
     public ActionResult<Plantilla> Agregar(CrearPlantillaRequest request)
     {
-        var plantilla = new Plantilla { IdPlantilla = request.IdPlantilla };
-        var nuevaPlantilla = service.Agregar(plantilla);
+        try
+        {
+            var integrantes = (request.Jugadores ?? new()).Select(jugador => new PlantillaJugador
+            {
+                IdJugador = jugador.IdJugador,
+                Numero = jugador.Numero,
+                EsSuplente = jugador.EsSuplente
+            }).ToList();
 
-        return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevaPlantilla.IdPlantilla }, nuevaPlantilla);
+            var nuevaPlantilla = service.CrearCompleta(request.IdPlantilla, integrantes);
+            return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevaPlantilla.IdPlantilla }, nuevaPlantilla);
+        }
+        catch (ArgumentException error)
+        {
+            return BadRequest(new { error = error.Message });
+        }
     }
 
     [HttpDelete("{id}")]

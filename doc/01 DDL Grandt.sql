@@ -60,21 +60,6 @@ CREATE TABLE Plantilla (
     CONSTRAINT PK_Plantilla PRIMARY KEY (IdPlantilla)
 );
 
--- Configuracion compartida por todas las plantillas.
-CREATE TABLE Configuracion (
-    IdConfiguracion TINYINT NOT NULL,
-    PresupuestoMaximo DECIMAL(10, 2) NOT NULL,
-    CantidadMaximaJugadores TINYINT UNSIGNED NOT NULL DEFAULT 20,
-
-    CONSTRAINT PK_Configuracion PRIMARY KEY (IdConfiguracion),
-    CONSTRAINT CK_Configuracion_Id CHECK (IdConfiguracion = 1),
-    CONSTRAINT CK_Configuracion_Presupuesto CHECK (PresupuestoMaximo >= 0),
-    CONSTRAINT CK_Configuracion_Cantidad CHECK (CantidadMaximaJugadores >= 11)
-);
-
-INSERT INTO Configuracion (IdConfiguracion, PresupuestoMaximo, CantidadMaximaJugadores)
-VALUES (1, 99999999.99, 20);
-
 -- =========================================
 -- 5. USUARIO
 -- =========================================

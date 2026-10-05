@@ -83,6 +83,53 @@ namespace GranDT_Clases.Repositories
             }
         }
 
+        public bool IntercambiarTitularSuplente(string idPlantilla, int idJugadorTitular, int idJugadorSuplente)
+        {
+            var db = _conexionBD.establecerconexion();
+
+            try
+            {
+                using var transaccion = db.BeginTransaction();
+                var existe = db.QuerySingle<int>(
+                    """
+                    SELECT COUNT(*)
+                    FROM PlantillaJugador titular
+                    INNER JOIN PlantillaJugador suplente
+                        ON suplente.IdPlantilla = titular.IdPlantilla
+                    WHERE titular.IdPlantilla = @idPlantilla
+                      AND titular.IdJugador = @idJugadorTitular
+                      AND titular.EsSuplente = 0
+                      AND suplente.IdJugador = @idJugadorSuplente
+                      AND suplente.EsSuplente = 1
+                    """,
+                    new { idPlantilla, idJugadorTitular, idJugadorSuplente },
+                    transaccion);
+
+                if (existe == 0)
+                {
+                    return false;
+                }
+
+                db.Execute(
+                    "sp_IntercambiarTitularSuplente",
+                    new
+                    {
+                        p_IdPlantilla = idPlantilla,
+                        p_IdJugadorTitular = idJugadorTitular,
+                        p_IdJugadorSuplente = idJugadorSuplente
+                    },
+                    transaccion,
+                    commandType: CommandType.StoredProcedure);
+
+                transaccion.Commit();
+                return true;
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
+
         public bool Eliminar(string idPlantilla, int idJugador)
         {
             var db = _conexionBD.establecerconexion();

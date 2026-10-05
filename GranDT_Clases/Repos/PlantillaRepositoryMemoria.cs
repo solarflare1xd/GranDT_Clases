@@ -69,8 +69,54 @@ namespace GranDT_Clases.Repositories
                     commandType: CommandType.StoredProcedure
                 );
 
-                // Como el Id es un string que ya viene en el objeto, 
-                // solo retornamos la misma entidad.
+                return plantilla;
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
+
+        public Plantilla CrearCompleta(Plantilla plantilla, IReadOnlyCollection<PlantillaJugador> integrantes)
+        {
+            var db = _conexionBD.establecerconexion();
+
+            try
+            {
+                using var transaccion = db.BeginTransaction();
+
+                plantilla.Presupuesto = db.QuerySingle<decimal>(
+                    "sp_AgregarPlantilla",
+                    new
+                    {
+                        p_IdPlantilla = plantilla.IdPlantilla,
+                        p_Presupuesto = plantilla.Presupuesto
+                    },
+                    transaccion,
+                    commandType: CommandType.StoredProcedure);
+
+                foreach (var integrante in integrantes)
+                {
+                    db.Execute(
+                        "sp_AgregarPlantillaJugador",
+                        new
+                        {
+                            p_IdPlantilla = plantilla.IdPlantilla,
+                            p_IdJugador = integrante.IdJugador,
+                            p_Numero = integrante.Numero,
+                            p_EsSuplente = integrante.EsSuplente
+                        },
+                        transaccion,
+                        commandType: CommandType.StoredProcedure);
+                }
+
+                db.Execute(
+                    "sp_ValidarPlantilla",
+                    new { p_IdPlantilla = plantilla.IdPlantilla },
+                    transaccion,
+                    commandType: CommandType.StoredProcedure);
+
+                transaccion.Commit();
                 return plantilla;
             }
             finally
@@ -137,23 +183,6 @@ namespace GranDT_Clases.Repositories
                 }
 
                 return plantilla;
-            }
-            finally
-            {
-                _conexionBD.cerrarConexion();
-            }
-        }
-
-        public ResultadoValidacionPlantilla? Validar(string idPlantilla)
-        {
-            var db = _conexionBD.establecerconexion();
-
-            try
-            {
-                return db.QueryFirstOrDefault<ResultadoValidacionPlantilla>(
-                    "sp_ValidarPlantilla",
-                    new { p_IdPlantilla = idPlantilla },
-                    commandType: CommandType.StoredProcedure);
             }
             finally
             {

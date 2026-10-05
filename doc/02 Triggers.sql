@@ -78,16 +78,9 @@ CREATE TRIGGER TR_Plantilla_ValidarInsert
 BEFORE INSERT ON Plantilla
 FOR EACH ROW
 BEGIN
-    DECLARE v_presupuesto DECIMAL(10, 2);
-
-    SELECT PresupuestoMaximo
-    INTO v_presupuesto
-    FROM Configuracion
-    WHERE IdConfiguracion = 1;
-
-    IF NEW.Presupuesto <> v_presupuesto THEN
+    IF NEW.Presupuesto <> 99999999.99 THEN
         SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Todas las plantillas deben usar el presupuesto configurado.';
+            SET MESSAGE_TEXT = 'Todas las plantillas deben usar el presupuesto fijo de 99999999.99.';
     END IF;
 END//
 
@@ -96,17 +89,11 @@ CREATE TRIGGER TR_Plantilla_ValidarUpdate
 BEFORE UPDATE ON Plantilla
 FOR EACH ROW
 BEGIN
-    DECLARE v_presupuesto DECIMAL(10, 2);
     DECLARE v_gasto DECIMAL(12, 2);
 
-    SELECT PresupuestoMaximo
-    INTO v_presupuesto
-    FROM Configuracion
-    WHERE IdConfiguracion = 1;
-
-    IF NEW.Presupuesto <> v_presupuesto THEN
+    IF NEW.Presupuesto <> 99999999.99 THEN
         SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Todas las plantillas deben usar el presupuesto configurado.';
+            SET MESSAGE_TEXT = 'Todas las plantillas deben usar el presupuesto fijo de 99999999.99.';
     END IF;
 
     SELECT COALESCE(SUM(j.Precio), 0)
@@ -115,9 +102,9 @@ BEGIN
     INNER JOIN Jugador j ON j.IdJugador = pj.IdJugador
     WHERE pj.IdPlantilla = OLD.IdPlantilla;
 
-    IF v_gasto > v_presupuesto THEN
+    IF v_gasto > 99999999.99 THEN
         SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'El presupuesto configurado es menor al costo de los jugadores de la plantilla.';
+            SET MESSAGE_TEXT = 'El presupuesto fijo es menor al costo de los jugadores de la plantilla.';
     END IF;
 END//
 
@@ -137,10 +124,8 @@ BEGIN
     DECLARE v_delantero INT;
     DECLARE v_posicion VARCHAR(30);
 
-    SELECT PresupuestoMaximo, CantidadMaximaJugadores
-    INTO v_presupuesto, v_max_jugadores
-    FROM Configuracion
-    WHERE IdConfiguracion = 1;
+    SET v_presupuesto = 99999999.99;
+    SET v_max_jugadores = 20;
 
     SELECT Precio, pos.Nombre
     INTO v_precio, v_posicion
@@ -161,7 +146,7 @@ BEGIN
 
     IF v_total >= v_max_jugadores THEN
         SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'La plantilla alcanzo la cantidad maxima configurada de jugadores.';
+            SET MESSAGE_TEXT = 'La plantilla alcanzo el maximo fijo de 20 jugadores.';
     END IF;
 
     IF v_gasto + v_precio > v_presupuesto THEN
@@ -208,10 +193,8 @@ BEGIN
     DECLARE v_delantero INT;
     DECLARE v_posicion VARCHAR(30);
 
-    SELECT PresupuestoMaximo, CantidadMaximaJugadores
-    INTO v_presupuesto, v_max_jugadores
-    FROM Configuracion
-    WHERE IdConfiguracion = 1;
+    SET v_presupuesto = 99999999.99;
+    SET v_max_jugadores = 20;
 
     SELECT Precio, pos.Nombre
     INTO v_precio, v_posicion
@@ -233,7 +216,7 @@ BEGIN
 
     IF v_total >= v_max_jugadores THEN
         SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'La plantilla alcanzo la cantidad maxima configurada de jugadores.';
+            SET MESSAGE_TEXT = 'La plantilla alcanzo el maximo fijo de 20 jugadores.';
     END IF;
 
     IF v_gasto + v_precio > v_presupuesto THEN
