@@ -53,7 +53,6 @@ INSERT INTO PlantillaJugador (IdPlantilla, IdJugador, Numero, EsSuplente) VALUES
 ('PLANT-ARG-001', 7, 6, 0),
 ('PLANT-ARG-001', 8, 7, 0),
 ('PLANT-ARG-001', 9, 8, 0),
-('PLANT-ARG-001', 10, 9, 0),
 ('PLANT-ARG-001', 11, 10, 0),
 ('PLANT-ARG-001', 12, 11, 0),
 ('PLANT-ARG-002', 13, 2, 0),
@@ -63,7 +62,6 @@ INSERT INTO PlantillaJugador (IdPlantilla, IdJugador, Numero, EsSuplente) VALUES
 ('PLANT-ARG-002', 17, 6, 0),
 ('PLANT-ARG-002', 18, 7, 0),
 ('PLANT-ARG-002', 19, 8, 0),
-('PLANT-ARG-002', 20, 9, 0),
 ('PLANT-ARG-002', 21, 10, 0),
 ('PLANT-ARG-002', 22, 11, 0);
 

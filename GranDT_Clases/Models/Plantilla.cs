@@ -19,7 +19,7 @@ public class Plantilla
     public bool FormacionValida =>
         Jugadores.Count(j => j.Posicion?.Nombre == "Arquero") == 1
         && Jugadores.Count(j => j.Posicion?.Nombre == "Defensor") == 4
-        && Jugadores.Count(j => j.Posicion?.Nombre == "Mediocampista") == 4
+        && Jugadores.Count(j => j.Posicion?.Nombre == "Mediocampista") == 3
         && Jugadores.Count(j => j.Posicion?.Nombre == "Delantero") == 2;
 
     public bool EsValida => PresupuestoValido && CantidadValida && FormacionValida;

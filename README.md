@@ -43,7 +43,7 @@ En Development, Swagger queda disponible en `/swagger`.
 - `POST /api/PlantillaJugador` incorpora un jugador a una plantilla; los triggers controlan presupuesto, limite y cupos por posicion.
 - `POST /api/Puntuacion?idJugador={id}` registra una nota para una fecha del torneo.
 
-Una plantilla se considera completa cuando tiene exactamente 1 arquero, 4 defensores, 4 mediocampistas y 2 delanteros titulares. Los suplentes no entran en el puntaje de fecha.
+Una plantilla se considera completa cuando tiene exactamente 1 arquero, 4 defensores, 3 mediocampistas y 2 delanteros titulares. Los suplentes no entran en el puntaje de fecha.
 
 ## Estructura
 

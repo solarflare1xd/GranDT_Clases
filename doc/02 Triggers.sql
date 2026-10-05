@@ -184,10 +184,10 @@ BEGIN
 
         IF (v_posicion = 'Arquero' AND v_arquero >= 1)
             OR (v_posicion = 'Defensor' AND v_defensor >= 4)
-            OR (v_posicion = 'Mediocampista' AND v_mediocampista >= 4)
+            OR (v_posicion = 'Mediocampista' AND v_mediocampista >= 3)
             OR (v_posicion = 'Delantero' AND v_delantero >= 2) THEN
             SIGNAL SQLSTATE '45000'
-                SET MESSAGE_TEXT = 'La formacion titular admite 1 arquero, 4 defensores, 4 mediocampistas y 2 delanteros.';
+                SET MESSAGE_TEXT = 'La formacion titular admite 1 arquero, 4 defensores, 3 mediocampistas y 2 delanteros.';
         END IF;
     END IF;
 END//
@@ -257,10 +257,10 @@ BEGIN
 
         IF (v_posicion = 'Arquero' AND v_arquero >= 1)
             OR (v_posicion = 'Defensor' AND v_defensor >= 4)
-            OR (v_posicion = 'Mediocampista' AND v_mediocampista >= 4)
+            OR (v_posicion = 'Mediocampista' AND v_mediocampista >= 3)
             OR (v_posicion = 'Delantero' AND v_delantero >= 2) THEN
             SIGNAL SQLSTATE '45000'
-                SET MESSAGE_TEXT = 'La formacion titular admite 1 arquero, 4 defensores, 4 mediocampistas y 2 delanteros.';
+                SET MESSAGE_TEXT = 'La formacion titular admite 1 arquero, 4 defensores, 3 mediocampistas y 2 delanteros.';
         END IF;
     END IF;
 END//
