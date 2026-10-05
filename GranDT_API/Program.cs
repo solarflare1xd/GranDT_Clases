@@ -3,6 +3,7 @@ using GranDT_Clases.Models;
 using GranDT_Clases.Repositories;
 using GranDT_Clases.Servicios;
 using GranDT_Clases.Services;
+using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -35,11 +36,9 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "GranDT API v1");
-    });
+    app.MapSwagger("/openapi/{documentName}.json");
+    app.MapScalarApiReference();
+    app.MapGet("/", () => Results.Redirect("/scalar/v1"));
 }
 else
 {
