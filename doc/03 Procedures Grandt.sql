@@ -212,7 +212,7 @@ BEGIN
         COUNT(pj.IdJugador) <= v_max_jugadores AS CantidadValida,
         COALESCE(SUM(CASE WHEN pj.EsSuplente = 0 AND pos.Nombre = 'Arquero' THEN 1 ELSE 0 END), 0) = 1
             AND COALESCE(SUM(CASE WHEN pj.EsSuplente = 0 AND pos.Nombre = 'Defensor' THEN 1 ELSE 0 END), 0) = 4
-            AND COALESCE(SUM(CASE WHEN pj.EsSuplente = 0 AND pos.Nombre = 'Mediocampista' THEN 1 ELSE 0 END), 0) = 3
+            AND COALESCE(SUM(CASE WHEN pj.EsSuplente = 0 AND pos.Nombre = 'Mediocampista' THEN 1 ELSE 0 END), 0) = 4
             AND COALESCE(SUM(CASE WHEN pj.EsSuplente = 0 AND pos.Nombre = 'Delantero' THEN 1 ELSE 0 END), 0) = 2 AS FormacionValida,
         COALESCE(SUM(j.Precio), 0) AS Gasto,
         v_presupuesto - COALESCE(SUM(j.Precio), 0) AS PresupuestoDisponible,
