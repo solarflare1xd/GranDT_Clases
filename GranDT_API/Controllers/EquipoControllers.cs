@@ -25,7 +25,7 @@ public class EquipoController : ControllerBase
     [HttpGet("{nombre}")]
     public ActionResult<Equipo> ObtenerPorNombre(string nombre)
     {
-        // Asegurate de que tu servicio tenga este método bien nombrado
+        
         var equipo = service.ObtenerPorNombre(nombre); 
 
         if (equipo == null)

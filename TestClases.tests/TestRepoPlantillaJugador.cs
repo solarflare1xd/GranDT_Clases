@@ -6,16 +6,7 @@ public class TestRepoPlantillaJugador : TestRepo
     [Fact]
     public void AltaPlantillaJugadorOK()
     {
-        var idPlantilla = $"IT-{Guid.NewGuid():N}";
-        var idJugador = CrearJugador(CrearPosicion());
-        Ejecutar("sp_AgregarPlantilla", new { p_IdPlantilla = idPlantilla, p_Presupuesto = 100m });
-        Ejecutar("sp_AgregarPlantillaJugador", new
-        {
-            p_IdPlantilla = idPlantilla,
-            p_IdJugador = idJugador,
-            p_Numero = 10,
-            p_EsSuplente = false
-        });
+        var (idPlantilla, idJugador) = CrearPlantillaJugador();
 
         var cantidad = ConsultarUno<int>(
             "SELECT COUNT(*) FROM PlantillaJugador WHERE IdPlantilla = @idPlantilla AND IdJugador = @idJugador",
@@ -28,7 +19,14 @@ public class TestRepoPlantillaJugador : TestRepo
     [Fact]
     public void TraerPlantillaJugadoresOK()
     {
-        var idPlantilla = $"IT-{Guid.NewGuid():N}";
+        var (idPlantilla, _) = CrearPlantillaJugador();
+
+        Assert.Contains(idPlantilla, Consultar<string>("sp_ObtenerTodasPlantillaJugadores"));
+    }
+
+    private (string IdPlantilla, int IdJugador) CrearPlantillaJugador()
+    {
+        var idPlantilla = NuevoIdPrueba();
         var idJugador = CrearJugador(CrearPosicion());
         Ejecutar("sp_AgregarPlantilla", new { p_IdPlantilla = idPlantilla, p_Presupuesto = 100m });
         Ejecutar("sp_AgregarPlantillaJugador", new
@@ -38,7 +36,6 @@ public class TestRepoPlantillaJugador : TestRepo
             p_Numero = 10,
             p_EsSuplente = false
         });
-
-        Assert.Contains(idPlantilla, Consultar<string>("sp_ObtenerTodasPlantillaJugadores"));
+        return (idPlantilla, idJugador);
     }
 }

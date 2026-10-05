@@ -7,6 +7,7 @@ namespace GranDT_api.Tests;
 
 public abstract class TestRepo : IDisposable
 {
+    private static int _secuenciaPruebas;
     private readonly MySqlTransaction _transaccion;
     private readonly Conexion _configuracionConexion;
     protected readonly MySqlConnection _conexion;
@@ -38,21 +39,25 @@ public abstract class TestRepo : IDisposable
         return _conexion.QuerySingleOrDefault<T>(sql, parametros, _transaccion, commandType: tipo);
     }
 
+    protected static string NuevoIdPrueba()
+    {
+        return Interlocked.Increment(ref _secuenciaPruebas).ToString();
+    }
+
     protected int CrearPosicion()
     {
-        return ConsultarUno<int>("sp_AgregarPosicion", new { p_Nombre = $"IT{Guid.NewGuid():N}"[..30] });
+        return ConsultarUno<int>("sp_AgregarPosicion", new { p_Nombre = NuevoIdPrueba() });
     }
 
     protected int CrearJugador(int idPosicion)
     {
-        var suffix = Guid.NewGuid().ToString("N");
         return ConsultarUno<int>(
             "sp_AgregarJugador",
             new
             {
                 p_Nombre = "Integration",
                 p_Apellido = "Test",
-                p_Apodo = $"IT{suffix}",
+                p_Apodo = NuevoIdPrueba(),
                 p_Precio = 1.25,
                 p_FechaNacimiento = new DateTime(2000, 1, 1),
                 p_IdPosicion = idPosicion
