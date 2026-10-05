@@ -12,6 +12,6 @@ namespace GranDT_Clases
         
         public bool EsAdministrador { get; set; }
 
-        public Plantilla PlantillaUsuario { get; set; }
+        public Plantilla? PlantillaUsuario { get; set; }
     }
 }

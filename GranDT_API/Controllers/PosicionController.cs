@@ -1,4 +1,5 @@
 using GranDT_Clases;
+using GranDT_api.Contracts.Requests;
 using GranDT_Clases.Servicios;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,8 +34,9 @@ public class PosicionController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<Posicion> Agregar(Posicion posicion)
+    public ActionResult<Posicion> Agregar(CrearPosicionRequest request)
     {
+        var posicion = new Posicion { Nombre = request.Nombre };
         var nuevaPosicion = service.Agregar(posicion);
 
         return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevaPosicion.IdPosicion }, nuevaPosicion);

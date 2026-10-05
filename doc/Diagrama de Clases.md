@@ -2,6 +2,7 @@
 
 ```mermaid
 classDiagram
+direction LR
     class Usuario {
         +string Email
         +string Nombre

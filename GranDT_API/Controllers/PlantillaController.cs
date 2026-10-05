@@ -1,4 +1,5 @@
 using GranDT_Clases;
+using GranDT_api.Contracts.Requests;
 using GranDT_Clases.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -56,8 +57,9 @@ public class PlantillaController : ControllerBase
 
 
     [HttpPost]
-    public ActionResult<Plantilla> Agregar(Plantilla plantilla)
+    public ActionResult<Plantilla> Agregar(CrearPlantillaRequest request)
     {
+        var plantilla = new Plantilla { IdPlantilla = request.IdPlantilla };
         var nuevaPlantilla = service.Agregar(plantilla);
 
         return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevaPlantilla.IdPlantilla }, nuevaPlantilla);

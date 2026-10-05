@@ -1,4 +1,5 @@
 using GranDT_Clases;
+using GranDT_api.Contracts.Requests;
 using GranDT_Clases.Servicios;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,8 +34,18 @@ public class FutbolistaController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<Futbolista> Agregar(Futbolista futbolista)
+    public ActionResult<Futbolista> Agregar(CrearFutbolistaRequest request)
     {
+        var futbolista = new Futbolista
+        {
+            Nombre = request.Nombre,
+            Apellido = request.Apellido,
+            Apodo = request.Apodo,
+            Precio = request.Precio,
+            FechaNacimiento = request.FechaNacimiento,
+            IdEquipo = request.IdEquipo,
+            Posicion = new Posicion { IdPosicion = request.IdPosicion }
+        };
         var nuevoFutbolista = service.Agregar(futbolista);
 
         return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevoFutbolista.IdJugador }, nuevoFutbolista);

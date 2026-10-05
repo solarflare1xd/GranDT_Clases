@@ -1,4 +1,6 @@
 using GranDT_Clases;
+using GranDT_api.Contracts.Requests;
+using GranDT_api.Contracts.Responses;
 using GranDT_Clases.Servicios;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,28 +18,41 @@ public class UsuarioController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<List<Usuario>> ObtenerTodos()
+    public ActionResult<List<UsuarioResponse>> ObtenerTodos()
     {
-        return Ok(service.ObtenerTodos());
+        return Ok(service.ObtenerTodos().Select(UsuarioResponse.Desde).ToList());
     }
 
     [HttpGet("{email}")]
-    public ActionResult<Usuario> ObtenerPorEmail(string email)
+    public ActionResult<UsuarioResponse> ObtenerPorEmail(string email)
     {
         var usuario = service.ObtenerPor(email);
 
         if (usuario == null)
             return NotFound();
 
-        return Ok(usuario);
+        return Ok(UsuarioResponse.Desde(usuario));
     }
 
     [HttpPost]
-    public ActionResult<Usuario> Agregar(Usuario usuario)
+    public ActionResult<UsuarioResponse> Agregar(CrearUsuarioRequest request)
     {
+        var usuario = new Usuario
+        {
+            Nombre = request.Nombre,
+            Apellido = request.Apellido,
+            Email = request.Email,
+            Nacimiento = request.Nacimiento,
+            Password = request.Password,
+            EsAdministrador = request.EsAdministrador,
+            PlantillaUsuario = request.IdPlantilla is null
+                ? null
+                : new Plantilla { IdPlantilla = request.IdPlantilla }
+        };
         var nuevoUsuario = service.Agregar(usuario);
 
-        return CreatedAtAction(nameof(ObtenerPorEmail), new { email = nuevoUsuario.Email }, nuevoUsuario);
+        var response = UsuarioResponse.Desde(nuevoUsuario);
+        return CreatedAtAction(nameof(ObtenerPorEmail), new { email = nuevoUsuario.Email }, response);
     }
 
     [HttpDelete("{email}")]

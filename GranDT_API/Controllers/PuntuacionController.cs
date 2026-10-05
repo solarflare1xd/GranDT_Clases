@@ -1,4 +1,5 @@
 using GranDT_Clases;
+using GranDT_api.Contracts.Requests;
 using GranDT_Clases.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,9 +34,16 @@ public class PuntuacionController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<Puntuacion> Agregar(Puntuacion puntuacion, [FromQuery] int idJugador)
+    public ActionResult<Puntuacion> Agregar(CrearPuntuacionRequest request)
     {
-        var nuevaPuntuacion = service.Agregar(puntuacion, idJugador);
+        var puntuacion = new Puntuacion
+        {
+            IdPuntuacion = request.IdPuntuacion,
+            Fecha = request.Fecha,
+            Puntaje = request.Puntaje,
+            IdJugador = request.IdJugador
+        };
+        var nuevaPuntuacion = service.Agregar(puntuacion, request.IdJugador);
 
         return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevaPuntuacion.IdPuntuacion }, nuevaPuntuacion);
     }

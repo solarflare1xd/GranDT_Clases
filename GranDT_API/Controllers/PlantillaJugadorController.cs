@@ -1,4 +1,5 @@
 using GranDT_Clases;
+using GranDT_api.Contracts.Requests;
 using GranDT_Clases.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,8 +34,15 @@ public class PlantillaJugadorController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<PlantillaJugador> Agregar(PlantillaJugador plantillaJugador)
+    public ActionResult<PlantillaJugador> Agregar(AgregarJugadorAPlantillaRequest request)
     {
+        var plantillaJugador = new PlantillaJugador
+        {
+            IdPlantilla = request.IdPlantilla,
+            IdJugador = request.IdJugador,
+            Numero = request.Numero,
+            EsSuplente = request.EsSuplente
+        };
         var nuevoRegistro = service.Agregar(plantillaJugador);
 
         return CreatedAtAction(
