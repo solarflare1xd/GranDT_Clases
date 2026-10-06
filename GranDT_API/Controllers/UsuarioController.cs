@@ -44,10 +44,7 @@ public class UsuarioController : ControllerBase
             Email = request.Email,
             Nacimiento = request.Nacimiento,
             Password = request.Password,
-            EsAdministrador = request.EsAdministrador,
-            PlantillaUsuario = request.IdPlantilla is int idPlantilla
-                ? new Plantilla { IdPlantilla = idPlantilla }
-                : null
+            EsAdministrador = request.EsAdministrador
         };
         var nuevoUsuario = service.Agregar(usuario);
 
