@@ -3,9 +3,9 @@ namespace GranDT_Clases.IRepos;
 public interface IPlantillaRepository
 {
     List<Plantilla> ObtenerTodos();
-    Plantilla? ObtenerPorId(string IdPlantilla);
+    Plantilla? ObtenerPorId(int idPlantilla);
     Plantilla Agregar(Plantilla plantilla);
-    bool Eliminar(string IdPlantilla);
+    bool Eliminar(int idPlantilla);
     Plantilla? ObtenerPorUsuario(string email) => null;
     Plantilla CrearCompleta(Plantilla plantilla, IReadOnlyCollection<PlantillaJugador> integrantes)
     {

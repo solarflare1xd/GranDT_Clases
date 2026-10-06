@@ -32,7 +32,7 @@ public class TestRepoUsuario : TestRepo
             p_Nacimiento = new DateTime(2000, 1, 1),
             p_Password = "integration-test-hash",
             p_EsAdministrador = false,
-            p_IdPlantilla = (string?)null
+            p_IdPlantilla = (int?)null
         });
         return email;
     }

@@ -28,7 +28,7 @@ erDiagram
         int IdEquipo FK
     }
     PLANTILLA {
-        varchar IdPlantilla PK
+        int IdPlantilla PK
         decimal Presupuesto
     }
     USUARIO {
@@ -38,10 +38,10 @@ erDiagram
         date Nacimiento
         char Password
         bit EsAdministrador
-        varchar IdPlantilla FK
+        int IdPlantilla FK
     }
     PLANTILLA_JUGADOR {
-        varchar IdPlantilla PK, FK
+        int IdPlantilla PK, FK
         int IdJugador PK, FK
         int Numero
         bit EsSuplente

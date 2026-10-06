@@ -22,7 +22,7 @@ public class PlantillaService
         return repository.ObtenerTodos();
     }
 
-    public Plantilla? ObtenerPorId(string id)
+    public Plantilla? ObtenerPorId(int id)
     {
         return repository.ObtenerPorId(id);
     }
@@ -50,7 +50,6 @@ public class PlantillaService
     }
 
     public Plantilla CrearCompleta(
-        string idPlantilla,
         decimal presupuesto,
         IReadOnlyCollection<PlantillaJugador> integrantes)
     {
@@ -66,16 +65,6 @@ public class PlantillaService
                 $"El presupuesto debe ser mayor que 0 y no superar {PresupuestoMaximoPermitido}.");
         }
 
-        if (string.IsNullOrWhiteSpace(idPlantilla))
-        {
-            throw new ArgumentException("El identificador de la plantilla es obligatorio.", nameof(idPlantilla));
-        }
-
-        if (repository.ObtenerPorId(idPlantilla) != null)
-        {
-            throw new ArgumentException("Ya existe una plantilla con ese identificador.", nameof(idPlantilla));
-        }
-
         if (integrantes.Count == 0)
         {
             throw new ArgumentException("La plantilla debe incluir jugadores titulares y suplentes.", nameof(integrantes));
@@ -88,7 +77,6 @@ public class PlantillaService
 
         var plantilla = new Plantilla
         {
-            IdPlantilla = idPlantilla,
             Presupuesto = presupuesto,
             CantidadMaximaJugadores = CantidadMaximaPermitida
         };
@@ -98,7 +86,6 @@ public class PlantillaService
             var futbolista = jugadorRepository.ObtenerPorId(integrante.IdJugador)
                 ?? throw new ArgumentException($"No existe el jugador {integrante.IdJugador}.", nameof(integrantes));
 
-            integrante.IdPlantilla = idPlantilla;
             integrante.Futbolista = futbolista;
 
             if (integrante.EsSuplente)
@@ -163,7 +150,7 @@ public class PlantillaService
             && titulares.Count(jugador => jugador.Posicion?.Nombre == "Delantero") == 2;
     }
 
-    public bool Eliminar(string id)
+    public bool Eliminar(int id)
     {
         return repository.Eliminar(id);
     }

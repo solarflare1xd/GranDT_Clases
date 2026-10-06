@@ -22,8 +22,8 @@ public class PlantillaController : ControllerBase
         return Ok(service.ObtenerTodos());
     }
 
-    [HttpGet("{id}")]
-    public ActionResult<Plantilla> ObtenerPorId(string id)
+    [HttpGet("{id:int}")]
+    public ActionResult<Plantilla> ObtenerPorId(int id)
     {
         var plantilla = service.ObtenerPorId(id);
 
@@ -56,7 +56,7 @@ public class PlantillaController : ControllerBase
                 EsSuplente = jugador.EsSuplente
             }).ToList();
 
-            var nuevaPlantilla = service.CrearCompleta(request.IdPlantilla, request.Presupuesto, integrantes);
+            var nuevaPlantilla = service.CrearCompleta(request.Presupuesto, integrantes);
             return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevaPlantilla.IdPlantilla }, nuevaPlantilla);
         }
         catch (ArgumentException error)
@@ -65,8 +65,8 @@ public class PlantillaController : ControllerBase
         }
     }
 
-    [HttpDelete("{id}")]
-    public IActionResult Eliminar(string id)
+    [HttpDelete("{id:int}")]
+    public IActionResult Eliminar(int id)
     {
         if (!service.Eliminar(id))
             return NotFound();

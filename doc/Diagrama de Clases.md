@@ -13,7 +13,7 @@ direction LR
         +Plantilla PlantillaUsuario
     }
     class Plantilla {
-        +string IdPlantilla
+        +int IdPlantilla
         +decimal Presupuesto
         +int CantidadMaximaJugadores
         +List~Futbolista~ Jugadores
@@ -41,7 +41,7 @@ direction LR
         +string Nombre
     }
     class PlantillaJugador {
-        +string IdPlantilla
+        +int IdPlantilla
         +int IdJugador
         +int Numero
         +bool EsSuplente

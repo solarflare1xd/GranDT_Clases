@@ -20,13 +20,13 @@ public class PlantillaJugadorService
 
     public List<PlantillaJugador> ObtenerTodos() => repository.ObtenerTodos();
 
-    public PlantillaJugador? ObtenerPorId(string idPlantilla, int idJugador) =>
+    public PlantillaJugador? ObtenerPorId(int idPlantilla, int idJugador) =>
         repository.ObtenerPorId(idPlantilla, idJugador);
 
     public PlantillaJugador Agregar(PlantillaJugador plantillaJugador) =>
         repository.Agregar(plantillaJugador);
 
-    public bool IntercambiarTitularSuplente(string idPlantilla, int idJugadorTitular, int idJugadorSuplente)
+    public bool IntercambiarTitularSuplente(int idPlantilla, int idJugadorTitular, int idJugadorSuplente)
     {
         if (jugadorRepository == null)
         {
@@ -58,7 +58,7 @@ public class PlantillaJugadorService
         return repository.IntercambiarTitularSuplente(idPlantilla, idJugadorTitular, idJugadorSuplente);
     }
 
-    public bool Eliminar(string idPlantilla, int idJugador) =>
+    public bool Eliminar(int idPlantilla, int idJugador) =>
         repository.Eliminar(idPlantilla, idJugador);
 
     private bool MismaPosicion(int idJugadorTitular, int idJugadorSuplente)

@@ -65,14 +65,14 @@ internal sealed class FakeJugadorRepository : IJugadorRepository
 
 internal sealed class FakePlantillaRepository : IPlantillaRepository
 {
-    private readonly Dictionary<string, Plantilla> plantillas = new();
+    private readonly Dictionary<int, Plantilla> plantillas = new();
 
     public List<Plantilla> ObtenerTodos()
     {
         return plantillas.Values.ToList();
     }
 
-    public Plantilla? ObtenerPorId(string id)
+    public Plantilla? ObtenerPorId(int id)
     {
         return plantillas.GetValueOrDefault(id);
     }
@@ -83,7 +83,7 @@ internal sealed class FakePlantillaRepository : IPlantillaRepository
         return plantilla;
     }
 
-    public bool Eliminar(string id)
+    public bool Eliminar(int id)
     {
         return plantillas.Remove(id);
     }
@@ -91,14 +91,14 @@ internal sealed class FakePlantillaRepository : IPlantillaRepository
 
 internal sealed class FakePlantillaJugadorRepository : IPlantillaJugadorRepository
 {
-    private readonly Dictionary<(string PlantillaId, int JugadorId), PlantillaJugador> integrantes = new();
+    private readonly Dictionary<(int PlantillaId, int JugadorId), PlantillaJugador> integrantes = new();
 
     public List<PlantillaJugador> ObtenerTodos()
     {
         return integrantes.Values.ToList();
     }
 
-    public PlantillaJugador? ObtenerPorId(string plantillaId, int jugadorId)
+    public PlantillaJugador? ObtenerPorId(int plantillaId, int jugadorId)
     {
         return integrantes.GetValueOrDefault((plantillaId, jugadorId));
     }
@@ -110,7 +110,7 @@ internal sealed class FakePlantillaJugadorRepository : IPlantillaJugadorReposito
         return plantillaJugador;
     }
 
-    public bool Eliminar(string plantillaId, int jugadorId)
+    public bool Eliminar(int plantillaId, int jugadorId)
     {
         return integrantes.Remove((plantillaId, jugadorId));
     }

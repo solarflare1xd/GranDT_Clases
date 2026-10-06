@@ -21,14 +21,13 @@ public class TestRepoPlantillaJugador : TestRepo
     {
         var (idPlantilla, _) = CrearPlantillaJugador();
 
-        Assert.Contains(idPlantilla, Consultar<string>("sp_ObtenerTodasPlantillaJugadores"));
+        Assert.Contains(idPlantilla, Consultar<int>("sp_ObtenerTodasPlantillaJugadores"));
     }
 
-    private (string IdPlantilla, int IdJugador) CrearPlantillaJugador()
+    private (int IdPlantilla, int IdJugador) CrearPlantillaJugador()
     {
-        var idPlantilla = NuevoIdPrueba();
+        var idPlantilla = ConsultarUno<int>("sp_AgregarPlantilla", new { p_Presupuesto = 100m });
         var idJugador = CrearJugador(CrearPosicion());
-        Ejecutar("sp_AgregarPlantilla", new { p_IdPlantilla = idPlantilla, p_Presupuesto = 100m });
         Ejecutar("sp_AgregarPlantillaJugador", new
         {
             p_IdPlantilla = idPlantilla,

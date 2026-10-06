@@ -27,7 +27,7 @@ namespace GranDT_api.Tests
 
             var plantilla = new Plantilla
             {
-                IdPlantilla = "PLA001",
+                IdPlantilla = 1,
                 Presupuesto = 100000
             };
 
@@ -46,16 +46,16 @@ namespace GranDT_api.Tests
 
             var plantilla = new Plantilla
             {
-                IdPlantilla = "PLA001",
+                IdPlantilla = 1,
                 Presupuesto = 100000
             };
 
             service.Agregar(plantilla);
 
-            var resultado = service.ObtenerPorId("PLA001");
+            var resultado = service.ObtenerPorId(1);
 
             Assert.NotNull(resultado);
-            Assert.Equal("PLA001", resultado.IdPlantilla);
+            Assert.Equal(1, resultado.IdPlantilla);
         }
 
         [Fact]
@@ -64,7 +64,7 @@ namespace GranDT_api.Tests
             var repository = new FakePlantillaRepository();
             var service = new PlantillaService(repository);
 
-            var resultado = service.ObtenerPorId("PLA999");
+            var resultado = service.ObtenerPorId(999);
 
             Assert.Null(resultado);
         }
@@ -77,16 +77,16 @@ namespace GranDT_api.Tests
 
             var plantilla = new Plantilla
             {
-                IdPlantilla = "PLA001",
+                IdPlantilla = 1,
                 Presupuesto = 100000
             };
 
             service.Agregar(plantilla);
 
-            var eliminado = service.Eliminar("PLA001");
+            var eliminado = service.Eliminar(1);
 
             Assert.True(eliminado);
-            Assert.Null(service.ObtenerPorId("PLA001"));
+            Assert.Null(service.ObtenerPorId(1));
         }
 
         [Fact]
@@ -95,7 +95,7 @@ namespace GranDT_api.Tests
             var repository = new FakePlantillaRepository();
             var service = new PlantillaService(repository);
 
-            var resultado = service.Eliminar("PLA999");
+            var resultado = service.Eliminar(999);
 
             Assert.False(resultado);
         }

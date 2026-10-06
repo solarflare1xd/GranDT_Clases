@@ -35,7 +35,7 @@ namespace GranDT_Clases.Repositories
             }
         }
 
-        public PlantillaJugador? ObtenerPorId(string idPlantilla, int idJugador)
+        public PlantillaJugador? ObtenerPorId(int idPlantilla, int idJugador)
         {
             var db = _conexionBD.establecerconexion();
             
@@ -83,7 +83,7 @@ namespace GranDT_Clases.Repositories
             }
         }
 
-        public bool IntercambiarTitularSuplente(string idPlantilla, int idJugadorTitular, int idJugadorSuplente)
+        public bool IntercambiarTitularSuplente(int idPlantilla, int idJugadorTitular, int idJugadorSuplente)
         {
             var db = _conexionBD.establecerconexion();
 
@@ -130,7 +130,7 @@ namespace GranDT_Clases.Repositories
             }
         }
 
-        public bool Eliminar(string idPlantilla, int idJugador)
+        public bool Eliminar(int idPlantilla, int idJugador)
         {
             var db = _conexionBD.establecerconexion();
             

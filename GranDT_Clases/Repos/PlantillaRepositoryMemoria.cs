@@ -35,7 +35,7 @@ namespace GranDT_Clases.Repositories
             }
         }
 
-        public Plantilla? ObtenerPorId(string id)
+        public Plantilla? ObtenerPorId(int id)
         {
             var db = _conexionBD.establecerconexion();
             
@@ -59,11 +59,10 @@ namespace GranDT_Clases.Repositories
             
             try
             {
-                plantilla.Presupuesto = db.QuerySingle<decimal>(
+                plantilla.IdPlantilla = db.QuerySingle<int>(
                     "sp_AgregarPlantilla",
                     new 
                     { 
-                        p_IdPlantilla = plantilla.IdPlantilla,
                         p_Presupuesto = plantilla.Presupuesto
                     },
                     commandType: CommandType.StoredProcedure
@@ -85,11 +84,10 @@ namespace GranDT_Clases.Repositories
             {
                 using var transaccion = db.BeginTransaction();
 
-                plantilla.Presupuesto = db.QuerySingle<decimal>(
+                plantilla.IdPlantilla = db.QuerySingle<int>(
                     "sp_AgregarPlantilla",
                     new
                     {
-                        p_IdPlantilla = plantilla.IdPlantilla,
                         p_Presupuesto = plantilla.Presupuesto
                     },
                     transaccion,
@@ -97,6 +95,7 @@ namespace GranDT_Clases.Repositories
 
                 foreach (var integrante in integrantes)
                 {
+                    integrante.IdPlantilla = plantilla.IdPlantilla;
                     db.Execute(
                         "sp_AgregarPlantillaJugador",
                         new
@@ -190,7 +189,7 @@ namespace GranDT_Clases.Repositories
             }
         }
 
-        public bool Eliminar(string id)
+        public bool Eliminar(int id)
         {
             var db = _conexionBD.establecerconexion();
             

@@ -154,7 +154,7 @@ END //
 
 -- Obtener plantilla por Id
 CREATE PROCEDURE sp_ObtenerPlantillaPorId(
-    IN p_IdPlantilla VARCHAR(50)
+    IN p_IdPlantilla INT
 )
 BEGIN
     SELECT p.IdPlantilla, p.Presupuesto, 20 AS CantidadMaximaJugadores
@@ -164,18 +164,17 @@ END //
 
 -- Agregar una plantilla
 CREATE PROCEDURE sp_AgregarPlantilla(
-    IN p_IdPlantilla VARCHAR(50),
     IN p_Presupuesto DECIMAL(10, 2)
 )
 BEGIN
-    INSERT INTO Plantilla (IdPlantilla, Presupuesto)
-    VALUES (p_IdPlantilla, p_Presupuesto);
+    INSERT INTO Plantilla (Presupuesto)
+    VALUES (p_Presupuesto);
 
-    SELECT Presupuesto FROM Plantilla WHERE IdPlantilla = p_IdPlantilla;
+    SELECT LAST_INSERT_ID();
 END //
 
 CREATE PROCEDURE sp_ValidarPlantilla(
-    IN p_IdPlantilla VARCHAR(50)
+    IN p_IdPlantilla INT
 )
 BEGIN
     DECLARE v_presupuesto DECIMAL(10, 2);
@@ -250,7 +249,7 @@ END //
 
 -- Eliminar una plantilla
 CREATE PROCEDURE sp_EliminarPlantilla(
-    IN p_IdPlantilla VARCHAR(50)
+    IN p_IdPlantilla INT
 )
 BEGIN
     DELETE FROM Plantilla WHERE IdPlantilla = p_IdPlantilla;
@@ -269,7 +268,7 @@ END //
 
 -- Obtener un registro específico por su clave compuesta
 CREATE PROCEDURE sp_ObtenerPlantillaJugadorPorId(
-    IN p_IdPlantilla VARCHAR(50),
+    IN p_IdPlantilla INT,
     IN p_IdJugador INT
 )
 BEGIN
@@ -280,7 +279,7 @@ END //
 
 -- Agregar un jugador a una plantilla
 CREATE PROCEDURE sp_AgregarPlantillaJugador(
-    IN p_IdPlantilla VARCHAR(50),
+    IN p_IdPlantilla INT,
     IN p_IdJugador INT,
     IN p_Numero INT,
     IN p_EsSuplente BIT
@@ -291,7 +290,7 @@ BEGIN
 END //
 
 CREATE PROCEDURE sp_IntercambiarTitularSuplente(
-    IN p_IdPlantilla VARCHAR(50),
+    IN p_IdPlantilla INT,
     IN p_IdJugadorTitular INT,
     IN p_IdJugadorSuplente INT
 )
@@ -332,7 +331,7 @@ END //
 
 -- Eliminar un jugador de una plantilla
 CREATE PROCEDURE sp_EliminarPlantillaJugador(
-    IN p_IdPlantilla VARCHAR(50),
+    IN p_IdPlantilla INT,
     IN p_IdJugador INT
 )
 BEGIN
@@ -408,7 +407,7 @@ CREATE PROCEDURE sp_AgregarUsuario(
     IN p_Nacimiento DATE,
     IN p_Password CHAR(64),
     IN p_EsAdministrador BIT,
-    IN p_IdPlantilla VARCHAR(50)
+    IN p_IdPlantilla INT
 )
 BEGIN
     INSERT INTO Usuario (Email, Nombre, Apellido, Nacimiento, Password, EsAdministrador, IdPlantilla) 

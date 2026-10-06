@@ -58,7 +58,7 @@ namespace GranDT_Clases.Repositories
             
             try
             {
-                string? idPlantilla = usuario.PlantillaUsuario != null ? usuario.PlantillaUsuario.IdPlantilla : null;
+                int? idPlantilla = usuario.PlantillaUsuario?.IdPlantilla;
                 var parametros = new DynamicParameters();
                 parametros.Add("p_Email", usuario.Email);
                 parametros.Add("p_Nombre", usuario.Nombre);

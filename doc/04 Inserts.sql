@@ -33,39 +33,41 @@ INSERT INTO Jugador (Nombre, Apellido, Apodo, Precio, FechaNacimiento, IdPosicio
 ('Facundo', 'Colidio', NULL, 3200000.00, '2000-01-04', 4, 2);
 
 -- 3. PLANTILLA
-INSERT INTO Plantilla (IdPlantilla, Presupuesto) VALUES 
-('PLANT-ARG-001', 99999999.99),
-('PLANT-ARG-002', 99999999.99);
+INSERT INTO Plantilla (Presupuesto) VALUES (99999999.99);
+SET @IdPlantillaMateo = LAST_INSERT_ID();
+
+INSERT INTO Plantilla (Presupuesto) VALUES (99999999.99);
+SET @IdPlantillaLucas = LAST_INSERT_ID();
 
 -- 4. USUARIO
 INSERT INTO Usuario (Email, Nombre, Apellido, Nacimiento, Password, EsAdministrador, IdPlantilla) VALUES 
-('mateo.caba@email.com', 'Mateo', 'Rossi', '2004-05-14', SHA2('bocacampeon123', 256), 0, 'PLANT-ARG-001'),
-('lucas.mza@email.com', 'Lucas', 'Fernandez', '2001-11-25', SHA2('millonario987', 256), 0, 'PLANT-ARG-002');
+('mateo.caba@email.com', 'Mateo', 'Rossi', '2004-05-14', SHA2('bocacampeon123', 256), 0, @IdPlantillaMateo),
+('lucas.mza@email.com', 'Lucas', 'Fernandez', '2001-11-25', SHA2('millonario987', 256), 0, @IdPlantillaLucas);
 
 -- 5. PLANTILLA JUGADOR
 INSERT INTO PlantillaJugador (IdPlantilla, IdJugador, Numero, EsSuplente) VALUES 
-('PLANT-ARG-001', 1, 1, 0),
-('PLANT-ARG-002', 2, 1, 0),
-('PLANT-ARG-001', 3, 2, 0),
-('PLANT-ARG-001', 4, 3, 0),
-('PLANT-ARG-001', 5, 4, 0),
-('PLANT-ARG-001', 6, 5, 0),
-('PLANT-ARG-001', 7, 6, 0),
-('PLANT-ARG-001', 8, 7, 0),
-('PLANT-ARG-001', 9, 8, 0),
-('PLANT-ARG-001', 10, 9, 0),
-('PLANT-ARG-001', 11, 10, 0),
-('PLANT-ARG-001', 12, 11, 0),
-('PLANT-ARG-002', 13, 2, 0),
-('PLANT-ARG-002', 14, 3, 0),
-('PLANT-ARG-002', 15, 4, 0),
-('PLANT-ARG-002', 16, 5, 0),
-('PLANT-ARG-002', 17, 6, 0),
-('PLANT-ARG-002', 18, 7, 0),
-('PLANT-ARG-002', 19, 8, 0),
-('PLANT-ARG-002', 20, 9, 0),
-('PLANT-ARG-002', 21, 10, 0),
-('PLANT-ARG-002', 22, 11, 0);
+(@IdPlantillaMateo, 1, 1, 0),
+(@IdPlantillaLucas, 2, 1, 0),
+(@IdPlantillaMateo, 3, 2, 0),
+(@IdPlantillaMateo, 4, 3, 0),
+(@IdPlantillaMateo, 5, 4, 0),
+(@IdPlantillaMateo, 6, 5, 0),
+(@IdPlantillaMateo, 7, 6, 0),
+(@IdPlantillaMateo, 8, 7, 0),
+(@IdPlantillaMateo, 9, 8, 0),
+(@IdPlantillaMateo, 10, 9, 0),
+(@IdPlantillaMateo, 11, 10, 0),
+(@IdPlantillaMateo, 12, 11, 0),
+(@IdPlantillaLucas, 13, 2, 0),
+(@IdPlantillaLucas, 14, 3, 0),
+(@IdPlantillaLucas, 15, 4, 0),
+(@IdPlantillaLucas, 16, 5, 0),
+(@IdPlantillaLucas, 17, 6, 0),
+(@IdPlantillaLucas, 18, 7, 0),
+(@IdPlantillaLucas, 19, 8, 0),
+(@IdPlantillaLucas, 20, 9, 0),
+(@IdPlantillaLucas, 21, 10, 0),
+(@IdPlantillaLucas, 22, 11, 0);
 
 -- 6. PUNTUACION
 INSERT INTO Puntuacion (IdPuntuacion, Fecha, Partido_date, Puntaje, IdJugador) VALUES 

@@ -28,7 +28,7 @@ namespace GranDT_api.Tests
 
             var plantillaJugador = new PlantillaJugador
             {
-                IdPlantilla = "PLA001",
+                IdPlantilla = 1,
                 IdJugador = 1,
                 Numero = 10,
                 EsSuplente = false
@@ -51,7 +51,7 @@ namespace GranDT_api.Tests
 
             var plantillaJugador = new PlantillaJugador
             {
-                IdPlantilla = "PLA001",
+                IdPlantilla = 1,
                 IdJugador = 1,
                 Numero = 10,
                 EsSuplente = false
@@ -59,10 +59,10 @@ namespace GranDT_api.Tests
 
             service.Agregar(plantillaJugador);
 
-            var resultado = service.ObtenerPorId("PLA001", 1);
+            var resultado = service.ObtenerPorId(1, 1);
 
             Assert.NotNull(resultado);
-            Assert.Equal("PLA001", resultado.IdPlantilla);
+            Assert.Equal(1, resultado.IdPlantilla);
             Assert.Equal(1, resultado.IdJugador);
         }
 
@@ -72,7 +72,7 @@ namespace GranDT_api.Tests
             var repository = new FakePlantillaJugadorRepository();
             var service = new PlantillaJugadorService(repository);
 
-            var resultado = service.ObtenerPorId("PLA999", 999);
+            var resultado = service.ObtenerPorId(999, 999);
 
             Assert.Null(resultado);
         }
@@ -85,7 +85,7 @@ namespace GranDT_api.Tests
 
             var plantillaJugador = new PlantillaJugador
             {
-                IdPlantilla = "PLA001",
+                IdPlantilla = 1,
                 IdJugador = 1,
                 Numero = 10,
                 EsSuplente = false
@@ -93,10 +93,10 @@ namespace GranDT_api.Tests
 
             service.Agregar(plantillaJugador);
 
-            var eliminado = service.Eliminar("PLA001", 1);
+            var eliminado = service.Eliminar(1, 1);
 
             Assert.True(eliminado);
-            Assert.Null(service.ObtenerPorId("PLA001", 1));
+            Assert.Null(service.ObtenerPorId(1, 1));
         }
 
         [Fact]
@@ -105,7 +105,7 @@ namespace GranDT_api.Tests
             var repository = new FakePlantillaJugadorRepository();
             var service = new PlantillaJugadorService(repository);
 
-            var resultado = service.Eliminar("PLA999", 999);
+            var resultado = service.Eliminar(999, 999);
 
             Assert.False(resultado);
         }

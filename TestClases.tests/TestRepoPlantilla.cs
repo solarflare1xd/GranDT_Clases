@@ -8,7 +8,7 @@ public class TestRepoPlantilla : TestRepo
     {
         var id = CrearPlantilla();
 
-        Assert.Equal(id, ConsultarUno<string>(
+        Assert.Equal(id, ConsultarUno<int>(
             "sp_ObtenerPlantillaPorId",
             new { p_IdPlantilla = id }));
     }
@@ -18,13 +18,11 @@ public class TestRepoPlantilla : TestRepo
     {
         var id = CrearPlantilla();
 
-        Assert.Contains(id, Consultar<string>("sp_ObtenerTodasPlantillas"));
+        Assert.Contains(id, Consultar<int>("sp_ObtenerTodasPlantillas"));
     }
 
-    private string CrearPlantilla()
+    private int CrearPlantilla()
     {
-        var id = NuevoIdPrueba();
-        Ejecutar("sp_AgregarPlantilla", new { p_IdPlantilla = id, p_Presupuesto = 100m });
-        return id;
+        return ConsultarUno<int>("sp_AgregarPlantilla", new { p_Presupuesto = 100m });
     }
 }

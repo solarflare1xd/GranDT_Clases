@@ -20,7 +20,7 @@ Las fechas deben enviarse en formato ISO `yyyy-MM-dd` (por ejemplo, el 5 de dici
 }
 ```
 
-`idPlantilla` es opcional. Las respuestas de usuario no incluyen la contrasena almacenada.
+`idPlantilla` es opcional y, si se envía, debe ser el ID numérico de una plantilla existente. Las respuestas de usuario no incluyen la contrasena almacenada.
 
 ## Crear futbolista
 
@@ -50,11 +50,10 @@ La API recibe los identificadores de posicion y equipo, no los objetos completos
 
 ## Crear plantilla completa
 
-`POST /api/Plantilla` recibe la plantilla, el presupuesto elegido por el usuario y sus integrantes en una solicitud. El presupuesto debe ser mayor que 0 y no superar $99.999.999,99; el maximo de jugadores es 20. Los jugadores deben existir. El service rechaza la solicitud si hay IDs repetidos, se excede el presupuesto o el maximo, o los titulares no cumplen la formacion de 1 arquero, 4 defensores, 4 mediocampistas y 2 delanteros.
+`POST /api/Plantilla` recibe el presupuesto elegido por el usuario y los integrantes en una solicitud. El ID se genera automáticamente y se devuelve en la respuesta. El presupuesto debe ser mayor que 0 y no superar $99.999.999,99; el maximo de jugadores es 20. Los jugadores deben existir. El service rechaza la solicitud si hay IDs repetidos, se excede el presupuesto o el maximo, o los titulares no cumplen la formacion de 1 arquero, 4 defensores, 4 mediocampistas y 2 delanteros.
 
 ```json
 {
-  "idPlantilla": "PLANT-001",
   "presupuesto": 10000000.00,
   "jugadores": [
     { "idJugador": 1, "numero": 1, "esSuplente": false },
@@ -77,7 +76,7 @@ La plantilla y sus integrantes se guardan en una transaccion: si alguna operacio
 
 ## Intercambiar titular y suplente
 
-`PATCH /api/PlantillaJugador/{idPlantilla}/intercambiar-titulares` intercambia un titular por un suplente de la misma posicion. La base verifica que la plantilla siga completa; el cambio se revierte si no pasa esa validacion.
+`PATCH /api/PlantillaJugador/{idPlantilla}/intercambiar-titulares` intercambia un titular por un suplente de la misma posicion. `idPlantilla` es el entero generado al crear la plantilla. La base verifica que la plantilla siga completa; el cambio se revierte si no pasa esa validacion.
 
 ```json
 {

@@ -22,8 +22,8 @@ public class PlantillaJugadorController : ControllerBase
         return Ok(service.ObtenerTodos());
     }
 
-    [HttpGet("{idPlantilla}/{idJugador:int}")]
-    public ActionResult<PlantillaJugador> ObtenerPorId(string idPlantilla, int idJugador)
+    [HttpGet("{idPlantilla:int}/{idJugador:int}")]
+    public ActionResult<PlantillaJugador> ObtenerPorId(int idPlantilla, int idJugador)
     {
         var plantillaJugador = service.ObtenerPorId(idPlantilla, idJugador);
 
@@ -51,9 +51,9 @@ public class PlantillaJugadorController : ControllerBase
             nuevoRegistro);
     }
 
-    [HttpPatch("{idPlantilla}/intercambiar-titulares")]
+    [HttpPatch("{idPlantilla:int}/intercambiar-titulares")]
     public IActionResult IntercambiarTitularSuplente(
-        string idPlantilla,
+        int idPlantilla,
         IntercambiarTitularSuplenteRequest request)
     {
         try
@@ -74,8 +74,8 @@ public class PlantillaJugadorController : ControllerBase
         }
     }
 
-    [HttpDelete("{idPlantilla}/{idJugador:int}")]
-    public IActionResult Eliminar(string idPlantilla, int idJugador)
+    [HttpDelete("{idPlantilla:int}/{idJugador:int}")]
+    public IActionResult Eliminar(int idPlantilla, int idJugador)
     {
         if (!service.Eliminar(idPlantilla, idJugador))
             return NotFound();

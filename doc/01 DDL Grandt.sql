@@ -53,7 +53,7 @@ CREATE TABLE Jugador (
 -- 4. PLANTILLA
 -- =========================================
 CREATE TABLE Plantilla (
-    IdPlantilla VARCHAR(50),
+    IdPlantilla INT AUTO_INCREMENT,
     Presupuesto DECIMAL(10, 2) NOT NULL,
     
     -- PK
@@ -70,7 +70,7 @@ CREATE TABLE Usuario (
     Nacimiento DATE NOT NULL,
     Password CHAR(64) NOT NULL,
     EsAdministrador BIT NOT NULL DEFAULT 0,
-    IdPlantilla VARCHAR(50) UNIQUE,
+    IdPlantilla INT UNIQUE,
 
     -- PK
     CONSTRAINT PK_Usuario PRIMARY KEY (Email),
@@ -83,7 +83,7 @@ CREATE TABLE Usuario (
 -- 6. PLANTILLA JUGADOR
 -- =========================================
 CREATE TABLE PlantillaJugador (
-    IdPlantilla VARCHAR(50) NOT NULL,
+    IdPlantilla INT NOT NULL,
     IdJugador INT NOT NULL,
     Numero INT NOT NULL,
     EsSuplente BIT NOT NULL,

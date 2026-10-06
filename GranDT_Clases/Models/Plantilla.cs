@@ -2,7 +2,7 @@ namespace GranDT_Clases;
 
 public class Plantilla
 {
-    public string IdPlantilla { get; set; } = string.Empty;
+    public int IdPlantilla { get; set; }
     public decimal Presupuesto { get; set; }
     public int CantidadMaximaJugadores { get; set; }
     public List<Futbolista> Jugadores { get; set; } = new();
