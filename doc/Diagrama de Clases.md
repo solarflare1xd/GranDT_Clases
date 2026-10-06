@@ -20,7 +20,7 @@ direction LR
         +List~Futbolista~ Jugadores_sup
     }
     class PlantillaService {
-        +CrearCompleta(id, integrantes)
+        +CrearCompleta(id, presupuesto, integrantes)
         +ObtenerGasto(plantilla)
         +ObtenerPresupuestoDisponible(plantilla)
         +PuntajeFecha(plantilla, fecha)

@@ -93,6 +93,45 @@ namespace GranDT_Clases.Repositories
             }
         }
 
+        public List<Futbolista> ObtenerPorNombre(string nombre)
+        {
+            var db = _conexionBD.establecerconexion();
+
+            try
+            {
+                var jugadores = new Dictionary<int, Futbolista>();
+
+                db.Query<Futbolista, Posicion, Puntuacion, Futbolista>(
+                    "sp_ObtenerJugadoresPorNombre",
+                    (jugador, posicion, puntuacion) =>
+                    {
+                        if (!jugadores.TryGetValue(jugador.IdJugador, out var existente))
+                        {
+                            existente = jugador;
+                            existente.Posicion = posicion;
+                            jugadores.Add(existente.IdJugador, existente);
+                        }
+
+                        if (puntuacion != null && !string.IsNullOrEmpty(puntuacion.IdPuntuacion))
+                        {
+                            existente.HistorialPuntajes.Add(puntuacion);
+                        }
+
+                        return existente;
+                    },
+                    new { p_Nombre = nombre },
+                    splitOn: "IdPosicion,IdPuntuacion",
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return jugadores.Values.ToList();
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
+
         public Futbolista Agregar(Futbolista jugador)
         {
             var db = _conexionBD.establecerconexion();

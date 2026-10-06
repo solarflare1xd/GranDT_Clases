@@ -44,6 +44,13 @@ internal sealed class FakeJugadorRepository : IJugadorRepository
         return jugadores.GetValueOrDefault(id);
     }
 
+    public List<Futbolista> ObtenerPorNombre(string nombre)
+    {
+        return jugadores.Values
+            .Where(jugador => jugador.Nombre.Contains(nombre, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
     public Futbolista Agregar(Futbolista futbolista)
     {
         jugadores[futbolista.IdJugador] = futbolista;

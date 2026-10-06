@@ -54,4 +54,4 @@ erDiagram
     }
 ```
 
-Cada usuario puede tener como maximo una plantilla y cada plantilla como maximo un usuario. La tabla `PlantillaJugador` representa la relacion muchos-a-muchos entre plantillas y jugadores. Todas las plantillas usan un presupuesto fijo de $99.999.999,99 y un maximo fijo de 20 jugadores.
+Cada usuario puede tener como maximo una plantilla y cada plantilla como maximo un usuario. La tabla `PlantillaJugador` representa la relacion muchos-a-muchos entre plantillas y jugadores. Al crear una plantilla, el usuario elige su presupuesto, que debe ser mayor que 0 y no superar $99.999.999,99. El maximo actual es de 20 jugadores.

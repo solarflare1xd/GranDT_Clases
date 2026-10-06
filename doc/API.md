@@ -24,6 +24,8 @@ Las fechas deben enviarse en formato ISO `yyyy-MM-dd` (por ejemplo, el 5 de dici
 
 ## Crear futbolista
 
+`GET /api/Futbolista?nombre=Juan` busca futbolistas cuyo nombre contenga el texto indicado. La búsqueda no distingue mayúsculas de minúsculas y devuelve una lista, que puede estar vacía si no hay coincidencias. Sin el parámetro `nombre`, `GET /api/Futbolista` sigue devolviendo todos los futbolistas.
+
 `POST /api/Futbolista`
 
 ```json
@@ -48,11 +50,12 @@ La API recibe los identificadores de posicion y equipo, no los objetos completos
 
 ## Crear plantilla completa
 
-`POST /api/Plantilla` recibe la plantilla y sus integrantes en una solicitud. Se aplica un presupuesto fijo de $99.999.999,99 y un maximo fijo de 20 jugadores. Los jugadores deben existir. El service rechaza la solicitud si hay IDs repetidos, se excede el presupuesto o el maximo, o los titulares no cumplen la formacion de 1 arquero, 4 defensores, 4 mediocampistas y 2 delanteros.
+`POST /api/Plantilla` recibe la plantilla, el presupuesto elegido por el usuario y sus integrantes en una solicitud. El presupuesto debe ser mayor que 0 y no superar $99.999.999,99; el maximo de jugadores es 20. Los jugadores deben existir. El service rechaza la solicitud si hay IDs repetidos, se excede el presupuesto o el maximo, o los titulares no cumplen la formacion de 1 arquero, 4 defensores, 4 mediocampistas y 2 delanteros.
 
 ```json
 {
   "idPlantilla": "PLANT-001",
+  "presupuesto": 10000000.00,
   "jugadores": [
     { "idJugador": 1, "numero": 1, "esSuplente": false },
     { "idJugador": 2, "numero": 2, "esSuplente": false },

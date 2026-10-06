@@ -49,11 +49,21 @@ public class PlantillaService
         return plantilla.Presupuesto - ObtenerGasto(plantilla);
     }
 
-    public Plantilla CrearCompleta(string idPlantilla, IReadOnlyCollection<PlantillaJugador> integrantes)
+    public Plantilla CrearCompleta(
+        string idPlantilla,
+        decimal presupuesto,
+        IReadOnlyCollection<PlantillaJugador> integrantes)
     {
         if (jugadorRepository == null)
         {
             throw new InvalidOperationException("No está configurado el acceso a jugadores.");
+        }
+
+        if (presupuesto <= 0 || presupuesto > PresupuestoMaximoPermitido)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(presupuesto),
+                $"El presupuesto debe ser mayor que 0 y no superar {PresupuestoMaximoPermitido}.");
         }
 
         if (string.IsNullOrWhiteSpace(idPlantilla))
@@ -79,7 +89,7 @@ public class PlantillaService
         var plantilla = new Plantilla
         {
             IdPlantilla = idPlantilla,
-            Presupuesto = PresupuestoMaximoPermitido,
+            Presupuesto = presupuesto,
             CantidadMaximaJugadores = CantidadMaximaPermitida
         };
 
@@ -136,7 +146,7 @@ public class PlantillaService
 
         if (!TieneFormacionTitularValida(plantilla.Jugadores))
         {
-            errores.Add("los titulares deben tener 1 arquero, 4 defensores, 3 mediocampistas y 2 delanteros");
+            errores.Add("los titulares deben tener 1 arquero, 4 defensores, 4 mediocampistas y 2 delanteros");
         }
 
         if (errores.Count > 0)
@@ -149,7 +159,7 @@ public class PlantillaService
     {
         return titulares.Count(jugador => jugador.Posicion?.Nombre == "Arquero") == 1
             && titulares.Count(jugador => jugador.Posicion?.Nombre == "Defensor") == 4
-            && titulares.Count(jugador => jugador.Posicion?.Nombre == "Mediocampista") == 3
+            && titulares.Count(jugador => jugador.Posicion?.Nombre == "Mediocampista") == 4
             && titulares.Count(jugador => jugador.Posicion?.Nombre == "Delantero") == 2;
     }
 

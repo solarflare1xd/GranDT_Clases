@@ -86,6 +86,21 @@ BEGIN
     WHERE j.IdJugador = p_IdJugador;
 END //
 
+DROP PROCEDURE IF EXISTS sp_ObtenerJugadoresPorNombre//
+CREATE PROCEDURE sp_ObtenerJugadoresPorNombre(
+    IN p_Nombre VARCHAR(50)
+)
+BEGIN
+    SELECT
+        j.IdJugador, j.Nombre, j.Apellido, j.Apodo, j.Precio, j.FechaNacimiento, j.IdEquipo,
+        pos.IdPosicion, pos.Nombre,
+        p.IdPuntuacion, p.Fecha, p.Puntaje, p.IdJugador
+    FROM Jugador j
+    LEFT JOIN Posicion pos ON j.IdPosicion = pos.IdPosicion
+    LEFT JOIN Puntuacion p ON j.IdJugador = p.IdJugador
+    WHERE LOWER(j.Nombre) LIKE CONCAT('%', LOWER(p_Nombre), '%');
+END //
+
 -- Agregar Jugador ahora pide p_IdPosicion (INT)
 CREATE PROCEDURE sp_AgregarJugador(
     IN p_Nombre VARCHAR(50),
@@ -153,9 +168,8 @@ CREATE PROCEDURE sp_AgregarPlantilla(
     IN p_Presupuesto DECIMAL(10, 2)
 )
 BEGIN
-    -- p_Presupuesto se conserva por compatibilidad; el presupuesto es fijo.
     INSERT INTO Plantilla (IdPlantilla, Presupuesto)
-    VALUES (p_IdPlantilla, 99999999.99);
+    VALUES (p_IdPlantilla, p_Presupuesto);
 
     SELECT Presupuesto FROM Plantilla WHERE IdPlantilla = p_IdPlantilla;
 END //
@@ -173,13 +187,17 @@ BEGIN
     DECLARE v_mediocampistas INT;
     DECLARE v_delanteros INT;
 
-    SET v_presupuesto = 99999999.99;
     SET v_max_jugadores = 20;
 
     IF NOT EXISTS (SELECT 1 FROM Plantilla WHERE IdPlantilla = p_IdPlantilla) THEN
         SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'La plantilla no existe.';
     END IF;
+
+    SELECT Presupuesto
+    INTO v_presupuesto
+    FROM Plantilla
+    WHERE IdPlantilla = p_IdPlantilla;
 
     SELECT
         COALESCE(SUM(j.Precio), 0),

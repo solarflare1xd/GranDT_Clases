@@ -56,7 +56,7 @@ public class PlantillaController : ControllerBase
                 EsSuplente = jugador.EsSuplente
             }).ToList();
 
-            var nuevaPlantilla = service.CrearCompleta(request.IdPlantilla, integrantes);
+            var nuevaPlantilla = service.CrearCompleta(request.IdPlantilla, request.Presupuesto, integrantes);
             return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevaPlantilla.IdPlantilla }, nuevaPlantilla);
         }
         catch (ArgumentException error)

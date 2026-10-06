@@ -78,9 +78,9 @@ CREATE TRIGGER TR_Plantilla_ValidarInsert
 BEFORE INSERT ON Plantilla
 FOR EACH ROW
 BEGIN
-    IF NEW.Presupuesto <> 99999999.99 THEN
+    IF NEW.Presupuesto <= 0 OR NEW.Presupuesto > 99999999.99 THEN
         SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Todas las plantillas deben usar el presupuesto fijo de 99999999.99.';
+            SET MESSAGE_TEXT = 'El presupuesto debe ser mayor que 0 y no superar 99999999.99.';
     END IF;
 END//
 
@@ -91,9 +91,9 @@ FOR EACH ROW
 BEGIN
     DECLARE v_gasto DECIMAL(12, 2);
 
-    IF NEW.Presupuesto <> 99999999.99 THEN
+    IF NEW.Presupuesto <= 0 OR NEW.Presupuesto > 99999999.99 THEN
         SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Todas las plantillas deben usar el presupuesto fijo de 99999999.99.';
+            SET MESSAGE_TEXT = 'El presupuesto debe ser mayor que 0 y no superar 99999999.99.';
     END IF;
 
     SELECT COALESCE(SUM(j.Precio), 0)
@@ -102,9 +102,9 @@ BEGIN
     INNER JOIN Jugador j ON j.IdJugador = pj.IdJugador
     WHERE pj.IdPlantilla = OLD.IdPlantilla;
 
-    IF v_gasto > 99999999.99 THEN
+    IF v_gasto > NEW.Presupuesto THEN
         SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'El presupuesto fijo es menor al costo de los jugadores de la plantilla.';
+            SET MESSAGE_TEXT = 'El presupuesto no alcanza para cubrir el costo de los jugadores de la plantilla.';
     END IF;
 END//
 
@@ -124,8 +124,17 @@ BEGIN
     DECLARE v_delantero INT;
     DECLARE v_posicion VARCHAR(30);
 
-    SET v_presupuesto = 99999999.99;
     SET v_max_jugadores = 20;
+
+    SELECT Presupuesto
+    INTO v_presupuesto
+    FROM Plantilla
+    WHERE IdPlantilla = NEW.IdPlantilla;
+
+    IF v_presupuesto IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'La plantilla no existe.';
+    END IF;
 
     SELECT Precio, pos.Nombre
     INTO v_precio, v_posicion
@@ -193,8 +202,17 @@ BEGIN
     DECLARE v_delantero INT;
     DECLARE v_posicion VARCHAR(30);
 
-    SET v_presupuesto = 99999999.99;
     SET v_max_jugadores = 20;
+
+    SELECT Presupuesto
+    INTO v_presupuesto
+    FROM Plantilla
+    WHERE IdPlantilla = NEW.IdPlantilla;
+
+    IF v_presupuesto IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'La plantilla no existe.';
+    END IF;
 
     SELECT Precio, pos.Nombre
     INTO v_precio, v_posicion

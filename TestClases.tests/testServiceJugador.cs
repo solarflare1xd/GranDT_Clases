@@ -76,6 +76,30 @@ namespace GranDT_api.Tests
         }
 
         [Fact]
+        public void TestObtenerJugadoresPorNombreParcial()
+        {
+            var repository = new FakeJugadorRepository();
+            var service = new JugadorService(repository);
+            service.Agregar(new Futbolista { IdJugador = 1, Nombre = "Juan" });
+            service.Agregar(new Futbolista { IdJugador = 2, Nombre = "Juan Pablo" });
+            service.Agregar(new Futbolista { IdJugador = 3, Nombre = "Lionel" });
+
+            var resultado = service.ObtenerPorNombre("juan");
+
+            Assert.Equal(2, resultado.Count);
+            Assert.All(resultado, jugador =>
+                Assert.Contains("juan", jugador.Nombre, StringComparison.OrdinalIgnoreCase));
+        }
+
+        [Fact]
+        public void TestObtenerPorNombreRechazaNombreVacio()
+        {
+            var service = new JugadorService(new FakeJugadorRepository());
+
+            Assert.Throws<ArgumentException>(() => service.ObtenerPorNombre(" "));
+        }
+
+        [Fact]
         public void TestEliminarJugadorExistente()
         {
             var repository = new FakeJugadorRepository();
@@ -108,4 +132,3 @@ namespace GranDT_api.Tests
         }
     }
 }
-

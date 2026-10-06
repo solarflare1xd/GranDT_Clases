@@ -24,6 +24,16 @@ public class JugadorService
         return repository.ObtenerPorId(id);
     }
 
+    public List<Futbolista> ObtenerPorNombre(string nombre)
+    {
+        if (string.IsNullOrWhiteSpace(nombre))
+        {
+            throw new ArgumentException("El nombre es obligatorio.", nameof(nombre));
+        }
+
+        return repository.ObtenerPorNombre(nombre.Trim());
+    }
+
     public Futbolista Agregar(Futbolista futbolista)
     {
         return repository.Agregar(futbolista);

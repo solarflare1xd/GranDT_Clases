@@ -17,8 +17,13 @@ public class FutbolistaController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<List<Futbolista>> ObtenerTodos()
+    public ActionResult<List<Futbolista>> ObtenerTodos([FromQuery] string? nombre)
     {
+        if (!string.IsNullOrWhiteSpace(nombre))
+        {
+            return Ok(service.ObtenerPorNombre(nombre));
+        }
+
         return Ok(service.ObtenerTodos());
     }
 
