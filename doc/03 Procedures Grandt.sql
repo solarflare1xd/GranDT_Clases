@@ -1,3 +1,37 @@
+DROP PROCEDURE IF EXISTS sp_ObtenerTodosEquipos;
+DROP PROCEDURE IF EXISTS sp_ObtenerEquipoPorNombre;
+DROP PROCEDURE IF EXISTS sp_AgregarEquipo;
+DROP PROCEDURE IF EXISTS sp_EliminarEquipo;
+DROP PROCEDURE IF EXISTS sp_ObtenerTodosJugadores;
+DROP PROCEDURE IF EXISTS sp_ObtenerJugadorPorId;
+DROP PROCEDURE IF EXISTS sp_ObtenerJugadoresPorNombre;
+DROP PROCEDURE IF EXISTS sp_AgregarJugador;
+DROP PROCEDURE IF EXISTS sp_AgregarJugadorConEquipo;
+DROP PROCEDURE IF EXISTS sp_EliminarJugador;
+DROP PROCEDURE IF EXISTS sp_ObtenerTodasPlantillas;
+DROP PROCEDURE IF EXISTS sp_ObtenerPlantillaPorId;
+DROP PROCEDURE IF EXISTS sp_AgregarPlantilla;
+DROP PROCEDURE IF EXISTS sp_ValidarPlantilla;
+DROP PROCEDURE IF EXISTS sp_ObtenerPlantillaPorUsuario;
+DROP PROCEDURE IF EXISTS sp_EliminarPlantilla;
+DROP PROCEDURE IF EXISTS sp_ObtenerTodasPlantillaJugadores;
+DROP PROCEDURE IF EXISTS sp_ObtenerPlantillaJugadorPorId;
+DROP PROCEDURE IF EXISTS sp_AgregarPlantillaJugador;
+DROP PROCEDURE IF EXISTS sp_IntercambiarTitularSuplente;
+DROP PROCEDURE IF EXISTS sp_EliminarPlantillaJugador;
+DROP PROCEDURE IF EXISTS sp_ObtenerTodasPosiciones;
+DROP PROCEDURE IF EXISTS sp_ObtenerPosicionPorId;
+DROP PROCEDURE IF EXISTS sp_AgregarPosicion;
+DROP PROCEDURE IF EXISTS sp_EliminarPosicion;
+DROP PROCEDURE IF EXISTS sp_ObtenerTodosUsuarios;
+DROP PROCEDURE IF EXISTS sp_ObtenerUsuarioPorEmail;
+DROP PROCEDURE IF EXISTS sp_AgregarUsuario;
+DROP PROCEDURE IF EXISTS sp_ObtenerTodasPuntuaciones;
+DROP PROCEDURE IF EXISTS sp_ObtenerPuntuacionPorId;
+DROP PROCEDURE IF EXISTS sp_AgregarPuntuacion;
+DROP PROCEDURE IF EXISTS sp_EliminarPuntuacion;
+DROP PROCEDURE IF EXISTS sp_EliminarUsuario;
+
 DELIMITER //
 
 -- =========================================
@@ -86,7 +120,6 @@ BEGIN
     WHERE j.IdJugador = p_IdJugador;
 END //
 
-DROP PROCEDURE IF EXISTS sp_ObtenerJugadoresPorNombre//
 CREATE PROCEDURE sp_ObtenerJugadoresPorNombre(
     IN p_Nombre VARCHAR(50)
 )
@@ -164,7 +197,7 @@ END //
 
 -- Agregar una plantilla
 CREATE PROCEDURE sp_AgregarPlantilla(
-    IN p_Presupuesto DECIMAL(10, 2)
+    IN p_Presupuesto DECIMAL(18, 2)
 )
 BEGIN
     INSERT INTO Plantilla (Presupuesto)
@@ -177,9 +210,9 @@ CREATE PROCEDURE sp_ValidarPlantilla(
     IN p_IdPlantilla INT
 )
 BEGIN
-    DECLARE v_presupuesto DECIMAL(10, 2);
+    DECLARE v_presupuesto DECIMAL(18, 2);
     DECLARE v_max_jugadores INT;
-    DECLARE v_gasto DECIMAL(12, 2);
+    DECLARE v_gasto DECIMAL(18, 2);
     DECLARE v_cantidad INT;
     DECLARE v_arqueros INT;
     DECLARE v_defensores INT;
@@ -214,7 +247,7 @@ BEGIN
 
     IF v_gasto > v_presupuesto OR v_cantidad > v_max_jugadores
         OR v_arqueros <> 1 OR v_defensores <> 4
-        OR v_mediocampistas <> 4 OR v_delanteros <> 2 THEN
+        OR v_mediocampistas <> 3 OR v_delanteros <> 3 THEN
         SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'La plantilla no cumple el presupuesto, el maximo de jugadores o la formacion titular.';
     END IF;

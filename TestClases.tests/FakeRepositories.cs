@@ -83,6 +83,13 @@ internal sealed class FakePlantillaRepository : IPlantillaRepository
         return plantilla;
     }
 
+    public Plantilla CrearCompleta(Plantilla plantilla, IReadOnlyCollection<PlantillaJugador> integrantes)
+    {
+        plantilla.IdPlantilla = plantillas.Count + 1;
+        plantillas[plantilla.IdPlantilla] = plantilla;
+        return plantilla;
+    }
+
     public bool Eliminar(int id)
     {
         return plantillas.Remove(id);

@@ -78,9 +78,9 @@ CREATE TRIGGER TR_Plantilla_ValidarInsert
 BEFORE INSERT ON Plantilla
 FOR EACH ROW
 BEGIN
-    IF NEW.Presupuesto <= 0 OR NEW.Presupuesto > 99999999.99 THEN
+    IF NEW.Presupuesto <= 0 THEN
         SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'El presupuesto debe ser mayor que 0 y no superar 99999999.99.';
+            SET MESSAGE_TEXT = 'El presupuesto debe ser mayor que 0.';
     END IF;
 END//
 
@@ -89,11 +89,11 @@ CREATE TRIGGER TR_Plantilla_ValidarUpdate
 BEFORE UPDATE ON Plantilla
 FOR EACH ROW
 BEGIN
-    DECLARE v_gasto DECIMAL(12, 2);
+    DECLARE v_gasto DECIMAL(18, 2);
 
-    IF NEW.Presupuesto <= 0 OR NEW.Presupuesto > 99999999.99 THEN
+    IF NEW.Presupuesto <= 0 THEN
         SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'El presupuesto debe ser mayor que 0 y no superar 99999999.99.';
+            SET MESSAGE_TEXT = 'El presupuesto debe ser mayor que 0.';
     END IF;
 
     SELECT COALESCE(SUM(j.Precio), 0)
@@ -113,9 +113,9 @@ CREATE TRIGGER TR_PlantillaJugador_ValidarInsert
 BEFORE INSERT ON PlantillaJugador
 FOR EACH ROW
 BEGIN
-    DECLARE v_presupuesto DECIMAL(10, 2);
+    DECLARE v_presupuesto DECIMAL(18, 2);
     DECLARE v_max_jugadores INT;
-    DECLARE v_gasto DECIMAL(12, 2);
+    DECLARE v_gasto DECIMAL(18, 2);
     DECLARE v_precio DECIMAL(10, 2);
     DECLARE v_total INT;
     DECLARE v_arquero INT;
@@ -178,10 +178,10 @@ BEGIN
 
         IF (v_posicion = 'Arquero' AND v_arquero >= 1)
             OR (v_posicion = 'Defensor' AND v_defensor >= 4)
-            OR (v_posicion = 'Mediocampista' AND v_mediocampista >= 4)
-            OR (v_posicion = 'Delantero' AND v_delantero >= 2) THEN
+            OR (v_posicion = 'Mediocampista' AND v_mediocampista >= 3)
+            OR (v_posicion = 'Delantero' AND v_delantero >= 3) THEN
             SIGNAL SQLSTATE '45000'
-                SET MESSAGE_TEXT = 'La formacion titular admite 1 arquero, 4 defensores, 4 mediocampistas y 2 delanteros.';
+                SET MESSAGE_TEXT = 'La formacion titular admite 1 arquero, 4 defensores, 3 mediocampistas y 3 delanteros.';
         END IF;
     END IF;
 END//
@@ -191,9 +191,9 @@ CREATE TRIGGER TR_PlantillaJugador_ValidarUpdate
 BEFORE UPDATE ON PlantillaJugador
 FOR EACH ROW
 BEGIN
-    DECLARE v_presupuesto DECIMAL(10, 2);
+    DECLARE v_presupuesto DECIMAL(18, 2);
     DECLARE v_max_jugadores INT;
-    DECLARE v_gasto DECIMAL(12, 2);
+    DECLARE v_gasto DECIMAL(18, 2);
     DECLARE v_precio DECIMAL(10, 2);
     DECLARE v_total INT;
     DECLARE v_arquero INT;
@@ -258,10 +258,10 @@ BEGIN
 
         IF (v_posicion = 'Arquero' AND v_arquero >= 1)
             OR (v_posicion = 'Defensor' AND v_defensor >= 4)
-            OR (v_posicion = 'Mediocampista' AND v_mediocampista >= 4)
-            OR (v_posicion = 'Delantero' AND v_delantero >= 2) THEN
+            OR (v_posicion = 'Mediocampista' AND v_mediocampista >= 3)
+            OR (v_posicion = 'Delantero' AND v_delantero >= 3) THEN
             SIGNAL SQLSTATE '45000'
-                SET MESSAGE_TEXT = 'La formacion titular admite 1 arquero, 4 defensores, 4 mediocampistas y 2 delanteros.';
+                SET MESSAGE_TEXT = 'La formacion titular admite 1 arquero, 4 defensores, 3 mediocampistas y 3 delanteros.';
         END IF;
     END IF;
 END//

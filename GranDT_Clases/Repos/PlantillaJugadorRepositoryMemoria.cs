@@ -63,6 +63,7 @@ namespace GranDT_Clases.Repositories
             
             try
             {
+                using var transaccion = db.BeginTransaction();
                 db.Execute(
                     "sp_AgregarPlantillaJugador",
                     new 
@@ -72,9 +73,32 @@ namespace GranDT_Clases.Repositories
                         p_Numero = plantillaJugador.Numero,
                         p_EsSuplente = plantillaJugador.EsSuplente
                     },
+                    transaccion,
                     commandType: CommandType.StoredProcedure
                 );
 
+                if (!plantillaJugador.EsSuplente)
+                {
+                    var titulares = db.QuerySingle<int>(
+                        """
+                        SELECT COUNT(*)
+                        FROM PlantillaJugador
+                        WHERE IdPlantilla = @IdPlantilla AND EsSuplente = 0
+                        """,
+                        new { plantillaJugador.IdPlantilla },
+                        transaccion);
+
+                    if (titulares == 11)
+                    {
+                        db.Execute(
+                            "sp_ValidarPlantilla",
+                            new { p_IdPlantilla = plantillaJugador.IdPlantilla },
+                            transaccion,
+                            commandType: CommandType.StoredProcedure);
+                    }
+                }
+
+                transaccion.Commit();
                 return plantillaJugador;
             }
             finally

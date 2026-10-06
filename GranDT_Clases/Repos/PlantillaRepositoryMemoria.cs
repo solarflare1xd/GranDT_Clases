@@ -109,11 +109,23 @@ namespace GranDT_Clases.Repositories
                         commandType: CommandType.StoredProcedure);
                 }
 
-                db.Execute(
-                    "sp_ValidarPlantilla",
-                    new { p_IdPlantilla = plantilla.IdPlantilla },
-                    transaccion,
-                    commandType: CommandType.StoredProcedure);
+                var titulares = db.QuerySingle<int>(
+                    """
+                    SELECT COUNT(*)
+                    FROM PlantillaJugador
+                    WHERE IdPlantilla = @IdPlantilla AND EsSuplente = 0
+                    """,
+                    new { plantilla.IdPlantilla },
+                    transaccion);
+
+                if (titulares == 11)
+                {
+                    db.Execute(
+                        "sp_ValidarPlantilla",
+                        new { p_IdPlantilla = plantilla.IdPlantilla },
+                        transaccion,
+                        commandType: CommandType.StoredProcedure);
+                }
 
                 transaccion.Commit();
                 return plantilla;

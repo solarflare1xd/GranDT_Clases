@@ -49,12 +49,22 @@ public class PlantillaController : ControllerBase
     {
         try
         {
-            var integrantes = (request.Jugadores ?? new()).Select(jugador => new PlantillaJugador
-            {
-                IdJugador = jugador.IdJugador,
-                Numero = jugador.Numero,
-                EsSuplente = jugador.EsSuplente
-            }).ToList();
+            var titulares = request.Titulares ?? new();
+            var suplentes = request.Suplentes ?? new();
+            var integrantes = titulares
+                .Select((idJugador, indice) => new PlantillaJugador
+                {
+                    IdJugador = idJugador,
+                    Numero = indice + 1,
+                    EsSuplente = false
+                })
+                .Concat(suplentes.Select((idJugador, indice) => new PlantillaJugador
+                {
+                    IdJugador = idJugador,
+                    Numero = titulares.Count + indice + 1,
+                    EsSuplente = true
+                }))
+                .ToList();
 
             var nuevaPlantilla = service.CrearCompleta(request.Presupuesto, integrantes);
             return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevaPlantilla.IdPlantilla }, nuevaPlantilla);

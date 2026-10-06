@@ -1,0 +1,4 @@
+USE GranDT;
+
+ALTER TABLE Plantilla
+    MODIFY COLUMN Presupuesto DECIMAL(18, 2) NOT NULL;

@@ -54,7 +54,7 @@ CREATE TABLE Jugador (
 -- =========================================
 CREATE TABLE Plantilla (
     IdPlantilla INT AUTO_INCREMENT,
-    Presupuesto DECIMAL(10, 2) NOT NULL,
+    Presupuesto DECIMAL(18, 2) NOT NULL,
     
     -- PK
     CONSTRAINT PK_Plantilla PRIMARY KEY (IdPlantilla)

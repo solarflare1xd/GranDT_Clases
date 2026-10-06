@@ -48,31 +48,46 @@ La API recibe los identificadores de posicion y equipo, no los objetos completos
 
 `POST /api/Posicion` recibe `{ "nombre": "Defensor" }`.
 
-## Crear plantilla completa
+## Crear plantilla
 
-`POST /api/Plantilla` recibe el presupuesto elegido por el usuario y los integrantes en una solicitud. El ID se genera automáticamente y se devuelve en la respuesta. El presupuesto debe ser mayor que 0 y no superar $99.999.999,99; el maximo de jugadores es 20. Los jugadores deben existir. El service rechaza la solicitud si hay IDs repetidos, se excede el presupuesto o el maximo, o los titulares no cumplen la formacion de 1 arquero, 4 defensores, 4 mediocampistas y 2 delanteros.
+`POST /api/Plantilla` recibe el presupuesto y dos listas opcionales de IDs: `titulares` y `suplentes`. Ambas pueden omitirse, enviarse como `null` o estar vacías para crear una plantilla sin jugadores. El API asigna automáticamente el número de cada jugador según el orden de las listas. El ID de la plantilla se genera automáticamente y se devuelve en la respuesta. El presupuesto debe ser mayor que 0; el límite técnico es $9.999.999.999.999.999,99 por el tipo `DECIMAL(18, 2)` de la base. El máximo de jugadores es 20. Los jugadores deben existir. Al crear o completar la plantilla se rechazan IDs repetidos, el exceso de presupuesto o jugadores, y más de 1 arquero, 4 defensores, 3 mediocampistas o 3 delanteros titulares.
+
+Para crearla vacía y agregar jugadores después:
 
 ```json
 {
-  "presupuesto": 10000000.00,
-  "jugadores": [
-    { "idJugador": 1, "numero": 1, "esSuplente": false },
-    { "idJugador": 2, "numero": 2, "esSuplente": false },
-    { "idJugador": 3, "numero": 3, "esSuplente": false },
-    { "idJugador": 4, "numero": 4, "esSuplente": false },
-    { "idJugador": 5, "numero": 5, "esSuplente": false },
-    { "idJugador": 6, "numero": 6, "esSuplente": false },
-    { "idJugador": 7, "numero": 7, "esSuplente": false },
-    { "idJugador": 8, "numero": 8, "esSuplente": false },
-    { "idJugador": 9, "numero": 9, "esSuplente": false },
-    { "idJugador": 10, "numero": 10, "esSuplente": false },
-    { "idJugador": 11, "numero": 11, "esSuplente": false },
-    { "idJugador": 12, "numero": 12, "esSuplente": true }
-  ]
+  "presupuesto": 100000000,
+  "titulares": null,
+  "suplentes": null
 }
 ```
 
-La plantilla y sus integrantes se guardan en una transaccion: si alguna operacion falla, no queda una plantilla parcial en la base.
+```json
+{
+  "presupuesto": 31000000.00,
+  "titulares": [1, 3, 4, 5, 6, 7, 8, 9, 11, 12, 21],
+  "suplentes": [2]
+}
+```
+
+Con los datos de `04 Inserts.sql`, esta selección cuesta $30.600.000,50. Los IDs dependen de los datos cargados en tu base; consultá `GET /api/Futbolista` para verificar los IDs, posiciones y precios disponibles antes de enviar la solicitud.
+
+La plantilla y los integrantes enviados se guardan en una transacción: si alguna operación falla, no queda una plantilla parcial en la base. Se puede crear vacía y agregar jugadores después:
+
+`POST /api/PlantillaJugador`
+
+```json
+{
+  "idPlantilla": 1,
+  "idJugador": 5,
+  "numero": 1,
+  "esSuplente": false
+}
+```
+
+Repetí la solicitud para cada jugador. Al completar los 11 titulares, la formación debe ser de 1 arquero, 4 defensores, 3 mediocampistas y 3 delanteros.
+
+Para ampliar una base existente sin borrar sus datos, ejecutá `06 Migrar presupuesto.sql`, luego volvé a ejecutar `02 Triggers.sql` y `03 Procedures Grandt.sql` para actualizar las validaciones y el procedimiento de creación.
 
 ## Intercambiar titular y suplente
 
