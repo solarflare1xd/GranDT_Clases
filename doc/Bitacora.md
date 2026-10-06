@@ -1,39 +1,21 @@
-# Bitacora
+# Bitácora del proyecto
 
-Completar los nombres de los integrantes y validar las fechas con el registro real del equipo antes de entregar.
+Registro de las actividades realizadas para el desarrollo de **Gran DT**.
 
-|   Fecha   | Integrante(s)   
-|---|---|---|Federico Mendoza 
-|---|---|---|Dimas Godoy
-|        Actividades        |
+## Integrantes
 
+- Federico Mendoza
+- Dimas Godoy
 
-| 2026-09-03 | Completeto | 
-|Se termino la elaboracion preliminar de toda la estructura de la api,controladores ,services,repositorios,
+## Registro de actividades
 
-| 2026-09-15 | Completeto | 
-|Se completo la elaboración de los controladores  estos  lo integramos desde el branch a la rama principal |
-
-| 2026-09-18 | Completeto | 
-|Se completo la elaboración de los tests de las interfaces de los repositorios |
-
-
-| 2026-09-21 | Completeto | 
-|Se completo la elaboración de los   servicios estos mismos lo integramos desde el branch a la rama principal y al mismo tiempo terminamos los test de los servicios|
-
-| 2026-09-22 | Completeto | 
-|hicimos la organizacion de todo lo hecho|
-
-| 2026-09-15 | Completeto | 
-|Se completo la elaboración de los controladores y servicios estos mismos lo integramos desde el branch a la rama principal |
-
- 2026-10-02 | Completeto | 
-|se completo la elaboracion de la base de datos|
-
-
-| 2026-10-04 | Completeto | 
-|Se arreglo los problemas de conexion con la base de datos gracias a los errores del api|
-|Se completo los tests de los repos con la base de datos  |
-|Se agrego los triggers con las weas que decia el tp|
-
+| Fecha | Actividades |
+|---|---|
+| 03/09/2026 | Se preparó la estructura inicial de la API, incluyendo controladores, servicios y repositorios. |
+| 15/09/2026 | Se completaron los controladores y se integraron los cambios a la rama principal. |
+| 18/09/2026 | Se completaron las pruebas de las interfaces de los repositorios. |
+| 21/09/2026 | Se completaron los servicios, se integraron los cambios a la rama principal y se finalizaron sus pruebas. |
+| 22/09/2026 | Se organizó el trabajo realizado hasta el momento. |
+| 02/10/2026 | Se completó la elaboración de la base de datos. |
+| 04/10/2026 | Se corrigieron problemas de conexión con la base de datos a partir de errores detectados en la API. Se completaron las pruebas de repositorios con la base de datos y se agregaron los triggers requeridos. |
 

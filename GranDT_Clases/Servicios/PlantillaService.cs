@@ -136,7 +136,7 @@ public class PlantillaService
 
         if (!TieneFormacionTitularValida(plantilla.Jugadores))
         {
-            errores.Add("los titulares deben tener 1 arquero, 4 defensores, 4 mediocampistas y 2 delanteros");
+            errores.Add("los titulares deben tener 1 arquero, 4 defensores, 3 mediocampistas y 2 delanteros");
         }
 
         if (errores.Count > 0)
@@ -149,7 +149,7 @@ public class PlantillaService
     {
         return titulares.Count(jugador => jugador.Posicion?.Nombre == "Arquero") == 1
             && titulares.Count(jugador => jugador.Posicion?.Nombre == "Defensor") == 4
-            && titulares.Count(jugador => jugador.Posicion?.Nombre == "Mediocampista") == 4
+            && titulares.Count(jugador => jugador.Posicion?.Nombre == "Mediocampista") == 3
             && titulares.Count(jugador => jugador.Posicion?.Nombre == "Delantero") == 2;
     }
 
