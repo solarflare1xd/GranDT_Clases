@@ -10,33 +10,21 @@ public class PlantillaJugadorService
     private readonly IPlantillaJugadorRepository repository;
     private readonly IJugadorRepository? jugadorRepository;
 
-    public PlantillaJugadorService(IPlantillaJugadorRepository repository)
-    {
-        this.repository = repository;
-    }
-
     public PlantillaJugadorService(
         IPlantillaJugadorRepository repository,
-        IJugadorRepository jugadorRepository)
-        : this(repository)
+        IJugadorRepository? jugadorRepository = null)
     {
+        this.repository = repository;
         this.jugadorRepository = jugadorRepository;
     }
 
-    public List<PlantillaJugador> ObtenerTodos()
-    {
-        return repository.ObtenerTodos();
-    }
+    public List<PlantillaJugador> ObtenerTodos() => repository.ObtenerTodos();
 
-    public PlantillaJugador? ObtenerPorId(string idPlantilla, int idJugador)
-    {
-        return repository.ObtenerPorId(idPlantilla, idJugador);
-    }
+    public PlantillaJugador? ObtenerPorId(string idPlantilla, int idJugador) =>
+        repository.ObtenerPorId(idPlantilla, idJugador);
 
-    public PlantillaJugador Agregar(PlantillaJugador plantillaJugador)
-    {
-        return repository.Agregar(plantillaJugador);
-    }
+    public PlantillaJugador Agregar(PlantillaJugador plantillaJugador) =>
+        repository.Agregar(plantillaJugador);
 
     public bool IntercambiarTitularSuplente(string idPlantilla, int idJugadorTitular, int idJugadorSuplente)
     {
@@ -62,14 +50,7 @@ public class PlantillaJugadorService
             throw new ArgumentException("El primer jugador debe ser titular y el segundo debe ser suplente.");
         }
 
-        var futbolistaTitular = jugadorRepository.ObtenerPorId(idJugadorTitular)
-            ?? throw new InvalidOperationException($"No existe el jugador {idJugadorTitular} asociado a la plantilla.");
-        var futbolistaSuplente = jugadorRepository.ObtenerPorId(idJugadorSuplente)
-            ?? throw new InvalidOperationException($"No existe el jugador {idJugadorSuplente} asociado a la plantilla.");
-
-        if (futbolistaTitular.Posicion == null
-            || futbolistaSuplente.Posicion == null
-            || futbolistaTitular.Posicion.IdPosicion != futbolistaSuplente.Posicion.IdPosicion)
+        if (!MismaPosicion(idJugadorTitular, idJugadorSuplente))
         {
             throw new ArgumentException("El titular y el suplente deben tener la misma posición.");
         }
@@ -77,9 +58,16 @@ public class PlantillaJugadorService
         return repository.IntercambiarTitularSuplente(idPlantilla, idJugadorTitular, idJugadorSuplente);
     }
 
-    public bool Eliminar(string idPlantilla, int idJugador)
-    {
-        return repository.Eliminar(idPlantilla, idJugador);
-    }
+    public bool Eliminar(string idPlantilla, int idJugador) =>
+        repository.Eliminar(idPlantilla, idJugador);
 
+    private bool MismaPosicion(int idJugadorTitular, int idJugadorSuplente)
+    {
+        var titular = jugadorRepository!.ObtenerPorId(idJugadorTitular);
+        var suplente = jugadorRepository.ObtenerPorId(idJugadorSuplente);
+
+        return titular?.Posicion != null
+            && suplente?.Posicion != null
+            && titular.Posicion.IdPosicion == suplente.Posicion.IdPosicion;
+    }
 }

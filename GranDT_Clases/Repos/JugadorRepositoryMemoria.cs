@@ -104,16 +104,14 @@ namespace GranDT_Clases.Repositories
                     throw new ArgumentException("El jugador debe tener una posición.", nameof(jugador));
                 }
 
-                var parametros = new
-                {
-                    p_Nombre = jugador.Nombre,
-                    p_Apellido = jugador.Apellido,
-                    p_Apodo = jugador.Apodo,
-                    p_Precio = jugador.Precio,
-                    p_FechaNacimiento = jugador.FechaNacimiento,
-                    p_IdPosicion = jugador.Posicion.IdPosicion,
-                    p_IdEquipo = jugador.IdEquipo
-                };
+                var parametros = new DynamicParameters();
+                parametros.Add("p_Nombre", jugador.Nombre);
+                parametros.Add("p_Apellido", jugador.Apellido);
+                parametros.Add("p_Apodo", jugador.Apodo);
+                parametros.Add("p_Precio", jugador.Precio);
+                parametros.Add("p_FechaNacimiento", jugador.FechaNacimiento.ToDateTime(TimeOnly.MinValue), DbType.Date);
+                parametros.Add("p_IdPosicion", jugador.Posicion.IdPosicion);
+                parametros.Add("p_IdEquipo", jugador.IdEquipo);
 
                 int id = db.ExecuteScalar<int>(
                     "sp_AgregarJugadorConEquipo",

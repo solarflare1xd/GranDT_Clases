@@ -2,6 +2,8 @@
 
 Los `POST` reciben DTOs de entrada: se envian solamente los valores necesarios para la operacion, no objetos relacionados completos ni propiedades calculadas.
 
+Las fechas deben enviarse en formato ISO `yyyy-MM-dd` (por ejemplo, el 5 de diciembre de 2000 se envia como `"2000-12-05"`), no como `"05/12/2000"`.
+
 ## Crear usuario
 
 `POST /api/Usuario`

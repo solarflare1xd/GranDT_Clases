@@ -59,19 +59,18 @@ namespace GranDT_Clases.Repositories
             try
             {
                 string? idPlantilla = usuario.PlantillaUsuario != null ? usuario.PlantillaUsuario.IdPlantilla : null;
+                var parametros = new DynamicParameters();
+                parametros.Add("p_Email", usuario.Email);
+                parametros.Add("p_Nombre", usuario.Nombre);
+                parametros.Add("p_Apellido", usuario.Apellido);
+                parametros.Add("p_Nacimiento", usuario.Nacimiento.ToDateTime(TimeOnly.MinValue), DbType.Date);
+                parametros.Add("p_Password", usuario.Password);
+                parametros.Add("p_EsAdministrador", usuario.EsAdministrador);
+                parametros.Add("p_IdPlantilla", idPlantilla);
 
                 db.Execute(
                     "sp_AgregarUsuario",
-                    new 
-                    { 
-                        p_Email = usuario.Email,
-                        p_Nombre = usuario.Nombre,
-                        p_Apellido = usuario.Apellido,
-                        p_Nacimiento = usuario.Nacimiento,
-                        p_Password = usuario.Password,
-                        p_EsAdministrador = usuario.EsAdministrador,
-                        p_IdPlantilla = idPlantilla
-                    },
+                    parametros,
                     commandType: CommandType.StoredProcedure
                 );
 
