@@ -7,6 +7,13 @@ public class PlantillaService
 {
     private const decimal PresupuestoMaximoPermitido = 9999999999999999.99m;
     private const int CantidadMaximaPermitida = 20;
+    private static readonly (string Posicion, int Maximo)[] LimitesPorPosicion =
+    {
+        ("Arquero", 1),
+        ("Defensor", 4),
+        ("Mediocampista", 2),
+        ("Delantero", 4)
+    };
 
     private readonly IPlantillaRepository repository;
     private readonly IJugadorRepository? jugadorRepository;
@@ -128,7 +135,7 @@ public class PlantillaService
 
         if (!TieneFormacionTitularDentroDeLimites(plantilla.Jugadores))
         {
-            errores.Add("la plantilla no puede superar 1 arquero, 4 defensores, 4 mediocampistas y 2 delanteros titulares");
+            errores.Add("la plantilla no puede superar 1 arquero, 4 defensores, 4 mediocampistas y  2 delanteros titulares");
         }
 
         if (errores.Count > 0)
@@ -139,12 +146,8 @@ public class PlantillaService
 
     private static bool TieneFormacionTitularDentroDeLimites(List<Futbolista> titulares)
     {
-        return titulares.Count(jugador => jugador.Posicion?.Nombre == "Arquero") <= 1
-            && titulares.Count(jugador => jugador.Posicion?.Nombre == "Defensor") <= 4
-            && titulares.Count(jugador => jugador.Posicion?.Nombre == "Mediocampista") <= 4
-            && titulares.Count(jugador => jugador.Posicion?.Nombre == "Delantero") <= 2;
-
-            
+        return LimitesPorPosicion.All(limite =>
+            titulares.Count(jugador => jugador.Posicion?.Nombre == limite.Posicion) <= limite.Maximo);
     }
 
     public bool Eliminar(int id)
