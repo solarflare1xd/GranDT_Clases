@@ -8,5 +8,6 @@ public sealed class CrearUsuarioRequest
     public DateOnly Nacimiento { get; set; }
     public string Password { get; set; } = string.Empty;
     public bool EsAdministrador { get; set; }
-    public int? IdPlantilla { get; set; }
+    
+    // public int? IdPlantilla { get; set; }
 }

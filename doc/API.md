@@ -50,7 +50,7 @@ La API recibe los identificadores de posicion y equipo, no los objetos completos
 
 ## Crear plantilla
 
-`POST /api/Plantilla` recibe el presupuesto y dos listas opcionales de IDs: `titulares` y `suplentes`. Ambas pueden omitirse, enviarse como `null` o estar vacías para crear una plantilla sin jugadores. El API asigna automáticamente el número de cada jugador según el orden de las listas. El ID de la plantilla se genera automáticamente y se devuelve en la respuesta. El presupuesto debe ser mayor que 0; el límite técnico es $9.999.999.999.999.999,99 por el tipo `DECIMAL(18, 2)` de la base. El máximo de jugadores es 20. Los jugadores deben existir. Al crear o completar la plantilla se rechazan IDs repetidos, el exceso de presupuesto o jugadores, y más de 1 arquero, 4 defensores, 3 mediocampistas o 3 delanteros titulares.
+`POST /api/Plantilla` recibe el presupuesto y dos listas opcionales de IDs: `titulares` y `suplentes`. Ambas pueden omitirse, enviarse como `null` o estar vacías para crear una plantilla sin jugadores. El API asigna automáticamente el número de cada jugador según el orden de las listas. El ID de la plantilla se genera automáticamente y se devuelve en la respuesta. El presupuesto debe ser mayor que 0; el límite técnico es $9.999.999.999.999.999,99 por el tipo `DECIMAL(18, 2)` de la base. El máximo de jugadores es 20. Los jugadores deben existir. Al crear o completar la plantilla se rechazan IDs repetidos, el exceso de presupuesto o jugadores, y más de 1 arquero, 4 defensores, 4 mediocampistas o 2 delanteros titulares.
 
 Para crearla vacía y agregar jugadores después:
 
@@ -65,12 +65,12 @@ Para crearla vacía y agregar jugadores después:
 ```json
 {
   "presupuesto": 31000000.00,
-  "titulares": [1, 3, 4, 5, 6, 7, 8, 9, 11, 12, 21],
+  "titulares": [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
   "suplentes": [2]
 }
 ```
 
-Con los datos de `04 Inserts.sql`, esta selección cuesta $27.500.000,50. Los IDs dependen de los datos cargados en tu base; consultá `GET /api/Futbolista` para verificar los IDs, posiciones y precios disponibles antes de enviar la solicitud.
+Con los datos de `04 Inserts.sql`, esta selección cuesta $29.800.000,50. Los IDs dependen de los datos cargados en tu base; consultá `GET /api/Futbolista` para verificar los IDs, posiciones y precios disponibles antes de enviar la solicitud.
 
 La plantilla y los integrantes enviados se guardan en una transacción: si alguna operación falla, no queda una plantilla parcial en la base. Se puede crear vacía y agregar jugadores después:
 
@@ -85,7 +85,7 @@ La plantilla y los integrantes enviados se guardan en una transacción: si algun
 }
 ```
 
-Repetí la solicitud para cada jugador. Al completar los 11 titulares, la formación debe ser de 1 arquero, 4 defensores, 3 mediocampistas y 3 delanteros.
+Repetí la solicitud para cada jugador. Al completar los 11 titulares, la formación debe ser de 1 arquero, 4 defensores, 4 mediocampistas y 2 delanteros.
 
 Para ampliar una base existente sin borrar sus datos, ejecutá `06 Migrar presupuesto.sql`, luego volvé a ejecutar `02 Triggers.sql` y `03 Procedures Grandt.sql` para actualizar las validaciones y el procedimiento de creación.
 

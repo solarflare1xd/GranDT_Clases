@@ -55,7 +55,7 @@ public class PlantillaService
     {
         if (jugadorRepository == null)
         {
-            throw new InvalidOperationException("No está configurado el acceso a jugadores.");
+            throw new InvalidOperationException("Server Internal Error");
         }
 
         if (presupuesto <= 0 || presupuesto > PresupuestoMaximoPermitido)
@@ -128,7 +128,7 @@ public class PlantillaService
 
         if (!TieneFormacionTitularDentroDeLimites(plantilla.Jugadores))
         {
-            errores.Add("la plantilla no puede superar 1 arquero, 4 defensores, 3 mediocampistas y 3 delanteros titulares");
+            errores.Add("la plantilla no puede superar 1 arquero, 4 defensores, 4 mediocampistas y 2 delanteros titulares");
         }
 
         if (errores.Count > 0)
@@ -141,8 +141,10 @@ public class PlantillaService
     {
         return titulares.Count(jugador => jugador.Posicion?.Nombre == "Arquero") <= 1
             && titulares.Count(jugador => jugador.Posicion?.Nombre == "Defensor") <= 4
-            && titulares.Count(jugador => jugador.Posicion?.Nombre == "Mediocampista") <= 3
-            && titulares.Count(jugador => jugador.Posicion?.Nombre == "Delantero") <= 3;
+            && titulares.Count(jugador => jugador.Posicion?.Nombre == "Mediocampista") <= 4
+            && titulares.Count(jugador => jugador.Posicion?.Nombre == "Delantero") <= 2;
+
+            
     }
 
     public bool Eliminar(int id)

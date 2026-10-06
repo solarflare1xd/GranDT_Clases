@@ -247,7 +247,7 @@ BEGIN
 
     IF v_gasto > v_presupuesto OR v_cantidad > v_max_jugadores
         OR v_arqueros <> 1 OR v_defensores <> 4
-        OR v_mediocampistas <> 3 OR v_delanteros <> 3 THEN
+        OR v_mediocampistas <> 4 OR v_delanteros <> 2 THEN
         SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'La plantilla no cumple el presupuesto, el maximo de jugadores o la formacion titular.';
     END IF;

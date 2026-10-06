@@ -101,7 +101,7 @@ namespace GranDT_api.Tests
         }
 
         [Fact]
-        public void CrearCompletaAceptaFormacionConTresMediocampistasYTresDelanteros()
+        public void CrearCompletaAceptaFormacionConCuatroMediocampistasYDosDelanteros()
         {
             var repository = new FakePlantillaRepository();
             var jugadorRepository = new FakeJugadorRepository();
@@ -109,8 +109,8 @@ namespace GranDT_api.Tests
             {
                 "Arquero",
                 "Defensor", "Defensor", "Defensor", "Defensor",
-                "Mediocampista", "Mediocampista", "Mediocampista",
-                "Delantero", "Delantero", "Delantero"
+                "Mediocampista", "Mediocampista", "Mediocampista", "Mediocampista",
+                "Delantero", "Delantero"
             };
 
             for (var indice = 0; indice < posiciones.Length; indice++)

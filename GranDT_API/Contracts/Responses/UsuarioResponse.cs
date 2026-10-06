@@ -9,7 +9,7 @@ public sealed class UsuarioResponse
     public string Email { get; init; } = string.Empty;
     public DateOnly Nacimiento { get; init; }
     public bool EsAdministrador { get; init; }
-    public int? IdPlantilla { get; init; }
+    //public int? IdPlantilla { get; init; }
 
     public static UsuarioResponse Desde(Usuario usuario)
     {
@@ -20,7 +20,7 @@ public sealed class UsuarioResponse
             Email = usuario.Email,
             Nacimiento = usuario.Nacimiento,
             EsAdministrador = usuario.EsAdministrador,
-            IdPlantilla = usuario.PlantillaUsuario?.IdPlantilla
+            //IdPlantilla = usuario.PlantillaUsuario?.IdPlantilla
         };
     }
 }
