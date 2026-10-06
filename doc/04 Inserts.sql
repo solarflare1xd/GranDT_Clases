@@ -55,7 +55,7 @@ INSERT INTO PlantillaJugador (IdPlantilla, IdJugador, Numero, EsSuplente) VALUES
 (@IdPlantillaMateo, 7, 6, 0),
 (@IdPlantillaMateo, 8, 7, 0),
 (@IdPlantillaMateo, 9, 8, 0),
-(@IdPlantillaMateo, 10, 9, 0),
+(@IdPlantillaMateo, 21, 9, 0),
 (@IdPlantillaMateo, 11, 10, 0),
 (@IdPlantillaMateo, 12, 11, 0),
 (@IdPlantillaLucas, 13, 2, 0),
@@ -65,7 +65,7 @@ INSERT INTO PlantillaJugador (IdPlantilla, IdJugador, Numero, EsSuplente) VALUES
 (@IdPlantillaLucas, 17, 6, 0),
 (@IdPlantillaLucas, 18, 7, 0),
 (@IdPlantillaLucas, 19, 8, 0),
-(@IdPlantillaLucas, 20, 9, 0),
+(@IdPlantillaLucas, 11, 9, 0),
 (@IdPlantillaLucas, 21, 10, 0),
 (@IdPlantillaLucas, 22, 11, 0);
 

@@ -70,7 +70,7 @@ Para crearla vacía y agregar jugadores después:
 }
 ```
 
-Con los datos de `04 Inserts.sql`, esta selección cuesta $30.600.000,50. Los IDs dependen de los datos cargados en tu base; consultá `GET /api/Futbolista` para verificar los IDs, posiciones y precios disponibles antes de enviar la solicitud.
+Con los datos de `04 Inserts.sql`, esta selección cuesta $27.500.000,50. Los IDs dependen de los datos cargados en tu base; consultá `GET /api/Futbolista` para verificar los IDs, posiciones y precios disponibles antes de enviar la solicitud.
 
 La plantilla y los integrantes enviados se guardan en una transacción: si alguna operación falla, no queda una plantilla parcial en la base. Se puede crear vacía y agregar jugadores después:
 
