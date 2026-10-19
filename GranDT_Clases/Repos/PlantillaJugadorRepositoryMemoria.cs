@@ -107,6 +107,53 @@ namespace GranDT_Clases.Repositories
             }
         }
 
+        public PlantillaJugador? ActualizarCondicion(int idPlantilla, int idJugador, bool esSuplente)
+        {
+            var integrante = ObtenerPorId(idPlantilla, idJugador);
+            if (integrante == null)
+                return null;
+
+            var db = _conexionBD.establecerconexion();
+            try
+            {
+                using var transaccion = db.BeginTransaction();
+                db.Execute(
+                    """
+                    UPDATE PlantillaJugador
+                    SET EsSuplente = @EsSuplente
+                    WHERE IdPlantilla = @IdPlantilla AND IdJugador = @IdJugador
+                    """,
+                    new { IdPlantilla = idPlantilla, IdJugador = idJugador, EsSuplente = esSuplente },
+                    transaccion);
+
+                var cantidadIntegrantes = db.QuerySingle<int>(
+                    """
+                    SELECT COUNT(*)
+                    FROM PlantillaJugador
+                    WHERE IdPlantilla = @IdPlantilla
+                    """,
+                    new { IdPlantilla = idPlantilla },
+                    transaccion);
+
+                if (cantidadIntegrantes >= 11)
+                {
+                    db.Execute(
+                        "sp_ValidarPlantilla",
+                        new { p_IdPlantilla = idPlantilla },
+                        transaccion,
+                        commandType: CommandType.StoredProcedure);
+                }
+
+                transaccion.Commit();
+                integrante.EsSuplente = esSuplente;
+                return integrante;
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
+
         public bool IntercambiarTitularSuplente(int idPlantilla, int idJugadorTitular, int idJugadorSuplente)
         {
             var db = _conexionBD.establecerconexion();

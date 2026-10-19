@@ -42,7 +42,7 @@ DELIMITER //
 CREATE PROCEDURE sp_ObtenerTodosEquipos()
 BEGIN
     SELECT 
-        e.Nombre,
+        e.IdEquipo, e.Nombre,
         j.IdJugador, j.Nombre, j.Apellido, j.Apodo, j.Precio, j.FechaNacimiento, j.IdEquipo,
         pos.IdPosicion, pos.Nombre
     FROM Equipo e
@@ -56,7 +56,7 @@ CREATE PROCEDURE sp_ObtenerEquipoPorNombre(
 )
 BEGIN
     SELECT 
-        e.Nombre,
+        e.IdEquipo, e.Nombre,
         j.IdJugador, j.Nombre, j.Apellido, j.Apodo, j.Precio, j.FechaNacimiento, j.IdEquipo,
         pos.IdPosicion, pos.Nombre
     FROM Equipo e

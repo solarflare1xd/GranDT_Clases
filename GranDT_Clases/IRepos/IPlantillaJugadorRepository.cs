@@ -9,6 +9,8 @@ public interface IPlantillaJugadorRepository
     PlantillaJugador? ObtenerPorId(int idPlantilla, int idJugador);
 
     PlantillaJugador Agregar(PlantillaJugador plantillaJugador);
+    PlantillaJugador? ActualizarCondicion(int idPlantilla, int idJugador, bool esSuplente) =>
+        throw new NotSupportedException("El repositorio no permite actualizar la condición del jugador.");
 
     bool IntercambiarTitularSuplente(int idPlantilla, int idJugadorTitular, int idJugadorSuplente)
     {

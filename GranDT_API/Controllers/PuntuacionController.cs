@@ -1,6 +1,7 @@
 using GranDT_Clases;
 using GranDT_api.Contracts.Requests;
 using GranDT_Clases.Services;
+using GranDT_Clases.Servicios;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GranDT_api.Controllers;
@@ -10,10 +11,12 @@ namespace GranDT_api.Controllers;
 public class PuntuacionController : ControllerBase
 {
     private readonly PuntuacionService service;
+    private readonly JugadorService jugadorService;
 
-    public PuntuacionController(PuntuacionService service)
+    public PuntuacionController(PuntuacionService service, JugadorService jugadorService)
     {
         this.service = service;
+        this.jugadorService = jugadorService;
     }
 
     [HttpGet]
@@ -46,6 +49,41 @@ public class PuntuacionController : ControllerBase
         var nuevaPuntuacion = service.Agregar(puntuacion, request.IdJugador);
 
         return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevaPuntuacion.IdPuntuacion }, nuevaPuntuacion);
+    }
+
+    [HttpPost("/api/futbolistas/{id:int}/puntuaciones")]
+    public IActionResult AgregarAFutbolista(int id, CrearPuntuacionRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.IdPuntuacion)
+            || request.Fecha is < 1 or > 49
+            || request.Puntaje is < 1 or > 10)
+        {
+            return BadRequest(new { error = "La puntuación, fecha e identificador no son válidos." });
+        }
+
+        if (jugadorService.ObtenerPorId(id) == null)
+            return NotFound();
+
+        var puntuacion = new Puntuacion
+        {
+            IdPuntuacion = request.IdPuntuacion.Trim(),
+            Fecha = request.Fecha,
+            Puntaje = request.Puntaje,
+            IdJugador = id
+        };
+
+        try
+        {
+            var nuevaPuntuacion = service.Agregar(puntuacion, id);
+            return CreatedAtAction(
+                nameof(ObtenerPorId),
+                new { id = nuevaPuntuacion.IdPuntuacion },
+                nuevaPuntuacion);
+        }
+        catch (Exception error) when (ApiErrors.IsKnown(error))
+        {
+            return ApiErrors.ToActionResult(error);
+        }
     }
 
     [HttpDelete("{id}")]

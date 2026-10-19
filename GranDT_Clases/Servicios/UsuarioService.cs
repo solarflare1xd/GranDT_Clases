@@ -45,12 +45,12 @@ public class UsuarioService
             throw new Exception("Datos inválidos");
         }
 
-        usuario.Password = BCrypt.Net.BCrypt.HashPassword(usuario.Password);
-
         if (repository.ObtenerPorEmail(usuario.Email) != null)
         {
             throw new Exception("El usuario ya existe");
         }
+
+        usuario.Password = BCrypt.Net.BCrypt.HashPassword(usuario.Password);
         return repository.Agregar(usuario);
     }
 

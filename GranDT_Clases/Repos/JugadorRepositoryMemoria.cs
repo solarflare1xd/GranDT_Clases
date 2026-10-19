@@ -135,7 +135,7 @@ namespace GranDT_Clases.Repositories
         public Futbolista Agregar(Futbolista jugador)
         {
             var db = _conexionBD.establecerconexion();
-            
+
             try
             {
                 if (jugador.Posicion == null)
@@ -160,6 +160,37 @@ namespace GranDT_Clases.Repositories
 
                 jugador.IdJugador = id;
                 return jugador;
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
+
+        public Futbolista? Actualizar(Futbolista jugador)
+        {
+            var db = _conexionBD.establecerconexion();
+
+            try
+            {
+                db.Execute(
+                    """
+                    UPDATE Jugador
+                    SET Precio = @Precio, IdEquipo = @IdEquipo
+                    WHERE IdJugador = @IdJugador
+                    """,
+                    new
+                    {
+                        jugador.Precio,
+                        jugador.IdEquipo,
+                        jugador.IdJugador
+                    });
+
+                var existe = db.QuerySingle<int>(
+                    "SELECT COUNT(*) FROM Jugador WHERE IdJugador = @IdJugador",
+                    new { jugador.IdJugador }) > 0;
+
+                return existe ? jugador : null;
             }
             finally
             {

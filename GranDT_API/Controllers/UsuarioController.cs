@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GranDT_api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/usuarios")]
 public class UsuarioController : ControllerBase
 {
     private readonly UsuarioService service;
@@ -35,21 +35,33 @@ public class UsuarioController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<UsuarioResponse> Agregar(CrearUsuarioRequest request)
+    public IActionResult Agregar(CrearUsuarioRequest request)
     {
+        if (request.Nacimiento == default || request.Nacimiento > DateOnly.FromDateTime(DateTime.UtcNow))
+            return BadRequest(new { error = "La fecha de nacimiento debe ser válida y no futura." });
+
         var usuario = new Usuario
         {
-            Nombre = request.Nombre,
-            Apellido = request.Apellido,
-            Email = request.Email,
+            Nombre = request.Nombre.Trim(),
+            Apellido = request.Apellido.Trim(),
+            Email = request.Email.Trim(),
             Nacimiento = request.Nacimiento,
-            Password = request.Password,
-            EsAdministrador = request.EsAdministrador
+            Password = request.Password
         };
-        var nuevoUsuario = service.Agregar(usuario);
 
-        var response = UsuarioResponse.Desde(nuevoUsuario);
-        return CreatedAtAction(nameof(ObtenerPorEmail), new { email = nuevoUsuario.Email }, response);
+        if (service.ObtenerPor(usuario.Email) != null)
+            return Conflict(new { error = "El usuario ya existe." });
+
+        try
+        {
+            var nuevoUsuario = service.Agregar(usuario);
+            var response = UsuarioResponse.Desde(nuevoUsuario);
+            return CreatedAtAction(nameof(ObtenerPorEmail), new { email = nuevoUsuario.Email }, response);
+        }
+        catch (Exception error) when (ApiErrors.IsKnown(error))
+        {
+            return ApiErrors.ToActionResult(error);
+        }
     }
 
     [HttpDelete("{email}")]

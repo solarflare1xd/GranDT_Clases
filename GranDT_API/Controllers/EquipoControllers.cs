@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace GranDT_api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/equipos")]
+[Route("api/equipo")]
 public class EquipoController : ControllerBase
 {
     private readonly EquipoService service;

@@ -53,6 +53,61 @@ namespace GranDT_Clases.Repositories
             }
         }
 
+        public Plantilla? ObtenerCompletaPorId(int id)
+        {
+            var db = _conexionBD.establecerconexion();
+
+            try
+            {
+                var plantilla = db.QueryFirstOrDefault<Plantilla>(
+                    "sp_ObtenerPlantillaPorId",
+                    new { p_IdPlantilla = id },
+                    commandType: CommandType.StoredProcedure);
+
+                if (plantilla == null)
+                    return null;
+
+                var integrantes = db.Query<PlantillaJugador, Futbolista, Posicion, PlantillaJugador>(
+                    """
+                    SELECT
+                        pj.IdPlantilla, pj.IdJugador, pj.Numero, pj.EsSuplente,
+                        j.IdJugador AS JugadorId, j.Nombre, j.Apellido, j.Apodo, j.Precio,
+                        j.FechaNacimiento, j.IdEquipo,
+                        pos.IdPosicion, pos.Nombre
+                    FROM PlantillaJugador pj
+                    INNER JOIN Jugador j ON j.IdJugador = pj.IdJugador
+                    LEFT JOIN Posicion pos ON pos.IdPosicion = j.IdPosicion
+                    WHERE pj.IdPlantilla = @IdPlantilla
+                    """,
+                    (integrante, jugador, posicion) =>
+                    {
+                        jugador.IdJugador = integrante.IdJugador;
+                        jugador.Posicion = posicion;
+                        integrante.Futbolista = jugador;
+                        return integrante;
+                    },
+                    new { IdPlantilla = id },
+                    splitOn: "JugadorId,IdPosicion").ToList();
+
+                foreach (var integrante in integrantes)
+                {
+                    if (integrante.Futbolista == null)
+                        continue;
+
+                    if (integrante.EsSuplente)
+                        plantilla.Jugadores_sup.Add(integrante.Futbolista);
+                    else
+                        plantilla.Jugadores.Add(integrante.Futbolista);
+                }
+
+                return plantilla;
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
+
         public Plantilla Agregar(Plantilla plantilla)
         {
             var db = _conexionBD.establecerconexion();
@@ -79,17 +134,12 @@ namespace GranDT_Clases.Repositories
         public Plantilla CrearCompleta(Plantilla plantilla, IReadOnlyCollection<PlantillaJugador> integrantes)
         {
             var db = _conexionBD.establecerconexion();
-
             try
             {
                 using var transaccion = db.BeginTransaction();
-
                 plantilla.IdPlantilla = db.QuerySingle<int>(
                     "sp_AgregarPlantilla",
-                    new
-                    {
-                        p_Presupuesto = plantilla.Presupuesto
-                    },
+                    new { p_Presupuesto = plantilla.Presupuesto },
                     transaccion,
                     commandType: CommandType.StoredProcedure);
 
@@ -119,6 +169,82 @@ namespace GranDT_Clases.Repositories
                     transaccion);
 
                 if (titulares == 11)
+                {
+                    db.Execute(
+                        "sp_ValidarPlantilla",
+                        new { p_IdPlantilla = plantilla.IdPlantilla },
+                        transaccion,
+                        commandType: CommandType.StoredProcedure);
+                }
+
+                transaccion.Commit();
+                return plantilla;
+            }
+            finally
+            {
+                _conexionBD.cerrarConexion();
+            }
+        }
+
+        public Plantilla CrearCompleta(string email, Plantilla plantilla, IReadOnlyCollection<PlantillaJugador> integrantes)
+        {
+            var db = _conexionBD.establecerconexion();
+
+            try
+            {
+                using var transaccion = db.BeginTransaction();
+                plantilla.IdPlantilla = db.QuerySingle<int>(
+                    "sp_AgregarPlantilla",
+                    new { p_Presupuesto = plantilla.Presupuesto },
+                    transaccion,
+                    commandType: CommandType.StoredProcedure);
+
+                foreach (var integrante in integrantes)
+                {
+                    integrante.IdPlantilla = plantilla.IdPlantilla;
+                    db.Execute(
+                        "sp_AgregarPlantillaJugador",
+                        new
+                        {
+                            p_IdPlantilla = plantilla.IdPlantilla,
+                            p_IdJugador = integrante.IdJugador,
+                            p_Numero = integrante.Numero,
+                            p_EsSuplente = integrante.EsSuplente
+                        },
+                        transaccion,
+                        commandType: CommandType.StoredProcedure);
+                }
+
+                var filasUsuario = db.Execute(
+                    """
+                    UPDATE Usuario
+                    SET IdPlantilla = @IdPlantilla
+                    WHERE Email = @Email AND IdPlantilla IS NULL
+                    """,
+                    new { IdPlantilla = plantilla.IdPlantilla, Email = email },
+                    transaccion);
+
+                if (filasUsuario == 0)
+                {
+                    var existeUsuario = db.QuerySingle<int>(
+                        "SELECT COUNT(*) FROM Usuario WHERE Email = @Email",
+                        new { Email = email },
+                        transaccion);
+                    if (existeUsuario == 0)
+                        throw new KeyNotFoundException($"No existe el usuario {email}.");
+                    throw new ResourceConflictException("El usuario ya tiene una plantilla.");
+                }
+
+                var cantidadTitulares = db.QuerySingle<int>(
+                    """
+                    SELECT COUNT(*)
+                    FROM PlantillaJugador
+                    WHERE IdPlantilla = @IdPlantilla AND EsSuplente = 0
+                    """,
+                    new { plantilla.IdPlantilla },
+                    transaccion);
+
+                if (cantidadTitulares == 11)
                 {
                     db.Execute(
                         "sp_ValidarPlantilla",

@@ -26,6 +26,24 @@ public class PlantillaJugadorService
     public PlantillaJugador Agregar(PlantillaJugador plantillaJugador) =>
         repository.Agregar(plantillaJugador);
 
+    public PlantillaJugador? ActualizarCondicion(int idPlantilla, int idJugador, bool esSuplente)
+    {
+        var integrante = repository.ObtenerPorId(idPlantilla, idJugador);
+        if (integrante == null)
+            return null;
+
+        if (integrante.EsSuplente == esSuplente)
+            throw new ArgumentException("El futbolista ya tiene la condición solicitada.", nameof(esSuplente));
+
+        if (jugadorRepository == null)
+            throw new InvalidOperationException("No está configurada la validación de la plantilla.");
+
+        var futbolista = jugadorRepository.ObtenerPorId(idJugador)
+            ?? throw new KeyNotFoundException($"No existe el futbolista {idJugador}.");
+        integrante.Futbolista = futbolista;
+        return repository.ActualizarCondicion(idPlantilla, idJugador, esSuplente);
+    }
+
     public bool IntercambiarTitularSuplente(int idPlantilla, int idJugadorTitular, int idJugadorSuplente)
     {
         if (jugadorRepository == null)

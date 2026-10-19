@@ -39,6 +39,11 @@ public class JugadorService
         return repository.Agregar(futbolista);
     }
 
+    public Futbolista? Actualizar(Futbolista futbolista)
+    {
+        return repository.Actualizar(futbolista);
+    }
+
     public bool Eliminar(int id)
     {
         return repository.Eliminar(id);
