@@ -1,7 +1,6 @@
 using GranDT_Clases;
 using GranDT_api.Contracts.Requests;
 using GranDT_Clases.Services;
-using GranDT_Clases.Servicios;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GranDT_api.Controllers;
@@ -11,12 +10,10 @@ namespace GranDT_api.Controllers;
 public class PlantillaController : ControllerBase
 {
     private readonly PlantillaService service;
-    private readonly UsuarioService usuarioService;
 
-    public PlantillaController(PlantillaService service, UsuarioService usuarioService)
+    public PlantillaController(PlantillaService service)
     {
         this.service = service;
-        this.usuarioService = usuarioService;
     }
 
     [HttpGet]
@@ -52,24 +49,10 @@ public class PlantillaController : ControllerBase
     {
         try
         {
-            var titulares = request.Titulares ?? new();
-            var suplentes = request.Suplentes ?? new();
-            var integrantes = titulares
-                .Select((idJugador, indice) => new PlantillaJugador
-                {
-                    IdJugador = idJugador,
-                    Numero = indice + 1,
-                    EsSuplente = false
-                })
-                .Concat(suplentes.Select((idJugador, indice) => new PlantillaJugador
-                {
-                    IdJugador = idJugador,
-                    Numero = titulares.Count + indice + 1,
-                    EsSuplente = true
-                }))
-                .ToList();
-
-            var nuevaPlantilla = service.CrearCompleta(request.Presupuesto, integrantes);
+            var nuevaPlantilla = service.CrearCompleta(
+                request.Presupuesto,
+                request.Titulares ?? new List<int>(),
+                request.Suplentes ?? new List<int>());
             return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevaPlantilla.IdPlantilla }, nuevaPlantilla);
         }
         catch (Exception error) when (ApiErrors.IsKnown(error))
@@ -81,41 +64,27 @@ public class PlantillaController : ControllerBase
     [HttpGet("/api/usuarios/{id}/plantillas")]
     public ActionResult<List<Plantilla>> ObtenerPlantillasDeUsuario(string id)
     {
-        if (usuarioService.ObtenerPor(id) == null)
+        var plantillas = service.ObtenerTodasDeUsuario(id);
+        if (plantillas == null)
             return NotFound();
 
-        var plantilla = service.ObtenerPorUsuario(id);
-        return Ok(plantilla == null ? new List<Plantilla>() : new List<Plantilla> { plantilla });
+        return Ok(plantillas);
     }
 
     [HttpPost("/api/usuarios/{id}/plantillas")]
     public IActionResult CrearParaUsuario(string id, CrearPlantillaRequest request)
     {
-        if (usuarioService.ObtenerPor(id) == null)
-            return NotFound();
-
-        var titulares = request.Titulares ?? new();
-        var suplentes = request.Suplentes ?? new();
-        var integrantes = titulares
-            .Select((idJugador, indice) => new PlantillaJugador
-            {
-                IdJugador = idJugador,
-                Numero = indice + 1,
-                EsSuplente = false
-            })
-            .Concat(suplentes.Select((idJugador, indice) => new PlantillaJugador
-            {
-                IdJugador = idJugador,
-                Numero = titulares.Count + indice + 1,
-                EsSuplente = true
-            }))
-            .ToList();
-
         try
         {
-            var nuevaPlantilla = service.CrearCompleta(id, request.Presupuesto, integrantes);
-            var respuesta = service.ObtenerCompletaPorId(nuevaPlantilla.IdPlantilla) ?? nuevaPlantilla;
-            return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevaPlantilla.IdPlantilla }, respuesta);
+            var nuevaPlantilla = service.CrearCompletaParaUsuario(
+                id,
+                request.Presupuesto,
+                request.Titulares ?? new List<int>(),
+                request.Suplentes ?? new List<int>());
+            if (nuevaPlantilla == null)
+                return NotFound();
+
+            return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevaPlantilla.IdPlantilla }, nuevaPlantilla);
         }
         catch (Exception error) when (ApiErrors.IsKnown(error))
         {

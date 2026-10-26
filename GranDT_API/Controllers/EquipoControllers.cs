@@ -39,8 +39,7 @@ public class EquipoController : ControllerBase
     [HttpPost]
     public ActionResult<Equipo> Agregar(CrearEquipoRequest request)
     {
-        var equipo = new Equipo { Nombre = request.Nombre };
-        var nuevoEquipo = service.Agregar(equipo);
+        var nuevoEquipo = service.Agregar(request.Nombre);
 
         return CreatedAtAction(nameof(ObtenerPorNombre), new { nombre = nuevoEquipo.Nombre }, nuevoEquipo);
     }

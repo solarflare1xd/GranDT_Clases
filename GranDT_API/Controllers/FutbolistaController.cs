@@ -11,12 +11,12 @@ namespace GranDT_api.Controllers;
 [Route("api/futbolista")]
 public class FutbolistaController : ControllerBase
 {
-    private readonly JugadorService service;
+    private readonly JugadorService jugadorService;
     private readonly EquipoService equipoService;
 
     public FutbolistaController(JugadorService service, EquipoService equipoService)
     {
-        this.service = service;
+        this.jugadorService = service;
         this.equipoService = equipoService;
     }
 
@@ -25,8 +25,8 @@ public class FutbolistaController : ControllerBase
     {
         var equipos = equipoService.ObtenerTodos().ToDictionary(equipo => equipo.IdEquipo, equipo => equipo.Nombre);
         var jugadores = string.IsNullOrWhiteSpace(nombre)
-            ? service.ObtenerTodos()
-            : service.ObtenerPorNombre(nombre);
+            ? jugadorService.ObtenerTodos()
+            : jugadorService.ObtenerPorNombre(nombre);
         var futbolistas = jugadores
             .Select(jugador => FutbolistaResponse.Desde(
                 jugador,
@@ -39,7 +39,7 @@ public class FutbolistaController : ControllerBase
     [HttpGet("{id:int}")]
     public ActionResult<FutbolistaResponse> ObtenerPorId(int id)
     {
-        var futbolista = service.ObtenerPorId(id);
+        var futbolista = jugadorService.ObtenerPorId(id);
         if (futbolista == null)
             return NotFound();
 
@@ -49,23 +49,16 @@ public class FutbolistaController : ControllerBase
     [HttpPost]
     public IActionResult Agregar(CrearFutbolistaRequest request)
     {
-        if (request.FechaNacimiento == default || request.FechaNacimiento > DateOnly.FromDateTime(DateTime.UtcNow))
-            return BadRequest(new { error = "La fecha de nacimiento debe ser válida y no futura." });
-
-        var futbolista = new Futbolista
-        {
-            Nombre = request.Nombre.Trim(),
-            Apellido = request.Apellido.Trim(),
-            Apodo = request.Apodo?.Trim(),
-            Precio = request.Precio,
-            FechaNacimiento = request.FechaNacimiento,
-            IdEquipo = request.IdEquipo,
-            Posicion = new Posicion { IdPosicion = request.IdPosicion }
-        };
-
         try
         {
-            var nuevoFutbolista = service.Agregar(futbolista);
+            var nuevoFutbolista = jugadorService.Agregar(
+                request.Nombre,
+                request.Apellido,
+                request.Apodo,
+                request.Precio,
+                request.FechaNacimiento,
+                request.IdEquipo,
+                request.IdPosicion);
             var response = ConEquipo(nuevoFutbolista);
             return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevoFutbolista.IdJugador }, response);
         }
@@ -78,20 +71,9 @@ public class FutbolistaController : ControllerBase
     [HttpPut("{id:int}")]
     public IActionResult Actualizar(int id, ActualizarFutbolistaRequest request)
     {
-        if (request.Precio <= 0)
-            return BadRequest(new { error = "La cotización debe ser mayor que cero." });
-
-        var existente = service.ObtenerPorId(id);
-        if (existente == null)
-            return NotFound();
-
-        existente.Precio = request.Precio;
-        existente.IdEquipo = request.IdEquipo;
-
         try
         {
-            service.Actualizar(existente);
-            var actualizado = service.ObtenerPorId(id);
+            var actualizado = jugadorService.Actualizar(id, request.Precio, request.IdEquipo);
             return actualizado == null ? NotFound() : Ok(ConEquipo(actualizado));
         }
         catch (Exception error) when (ApiErrors.IsKnown(error))
@@ -103,7 +85,7 @@ public class FutbolistaController : ControllerBase
     [HttpDelete("{id:int}")]
     public IActionResult Eliminar(int id)
     {
-        if (!service.Eliminar(id))
+        if (!jugadorService.Eliminar(id))
             return NotFound();
 
         return NoContent();

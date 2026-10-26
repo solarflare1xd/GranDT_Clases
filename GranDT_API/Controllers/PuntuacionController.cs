@@ -1,7 +1,6 @@
 using GranDT_Clases;
 using GranDT_api.Contracts.Requests;
 using GranDT_Clases.Services;
-using GranDT_Clases.Servicios;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GranDT_api.Controllers;
@@ -11,12 +10,10 @@ namespace GranDT_api.Controllers;
 public class PuntuacionController : ControllerBase
 {
     private readonly PuntuacionService service;
-    private readonly JugadorService jugadorService;
 
-    public PuntuacionController(PuntuacionService service, JugadorService jugadorService)
+    public PuntuacionController(PuntuacionService service)
     {
         this.service = service;
-        this.jugadorService = jugadorService;
     }
 
     [HttpGet]
@@ -37,44 +34,39 @@ public class PuntuacionController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<Puntuacion> Agregar(CrearPuntuacionRequest request)
+    public IActionResult Agregar(CrearPuntuacionRequest request)
     {
-        var puntuacion = new Puntuacion
+        try
         {
-            IdPuntuacion = request.IdPuntuacion,
-            Fecha = request.Fecha,
-            Puntaje = request.Puntaje,
-            IdJugador = request.IdJugador
-        };
-        var nuevaPuntuacion = service.Agregar(puntuacion, request.IdJugador);
+            var nuevaPuntuacion = service.Agregar(
+                request.IdPuntuacion,
+                request.Fecha,
+                request.Puntaje,
+                request.IdJugador);
+            if (nuevaPuntuacion == null)
+                return NotFound();
 
-        return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevaPuntuacion.IdPuntuacion }, nuevaPuntuacion);
+            return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevaPuntuacion.IdPuntuacion }, nuevaPuntuacion);
+        }
+        catch (Exception error) when (ApiErrors.IsKnown(error))
+        {
+            return ApiErrors.ToActionResult(error);
+        }
     }
 
     [HttpPost("/api/futbolistas/{id:int}/puntuaciones")]
     public IActionResult AgregarAFutbolista(int id, CrearPuntuacionRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.IdPuntuacion)
-            || request.Fecha is < 1 or > 49
-            || request.Puntaje is < 1 or > 10)
-        {
-            return BadRequest(new { error = "La puntuación, fecha e identificador no son válidos." });
-        }
-
-        if (jugadorService.ObtenerPorId(id) == null)
-            return NotFound();
-
-        var puntuacion = new Puntuacion
-        {
-            IdPuntuacion = request.IdPuntuacion.Trim(),
-            Fecha = request.Fecha,
-            Puntaje = request.Puntaje,
-            IdJugador = id
-        };
-
         try
         {
-            var nuevaPuntuacion = service.Agregar(puntuacion, id);
+            var nuevaPuntuacion = service.Agregar(
+                request.IdPuntuacion,
+                request.Fecha,
+                request.Puntaje,
+                id);
+            if (nuevaPuntuacion == null)
+                return NotFound();
+
             return CreatedAtAction(
                 nameof(ObtenerPorId),
                 new { id = nuevaPuntuacion.IdPuntuacion },

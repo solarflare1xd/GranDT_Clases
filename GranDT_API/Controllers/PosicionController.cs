@@ -36,8 +36,7 @@ public class PosicionController : ControllerBase
     [HttpPost]
     public ActionResult<Posicion> Agregar(CrearPosicionRequest request)
     {
-        var posicion = new Posicion { Nombre = request.Nombre };
-        var nuevaPosicion = service.Agregar(posicion);
+        var nuevaPosicion = service.Agregar(request.Nombre);
 
         return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevaPosicion.IdPosicion }, nuevaPosicion);
     }

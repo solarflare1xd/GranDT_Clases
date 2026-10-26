@@ -37,24 +37,14 @@ public class UsuarioController : ControllerBase
     [HttpPost]
     public IActionResult Agregar(CrearUsuarioRequest request)
     {
-        if (request.Nacimiento == default || request.Nacimiento > DateOnly.FromDateTime(DateTime.UtcNow))
-            return BadRequest(new { error = "La fecha de nacimiento debe ser válida y no futura." });
-
-        var usuario = new Usuario
-        {
-            Nombre = request.Nombre.Trim(),
-            Apellido = request.Apellido.Trim(),
-            Email = request.Email.Trim(),
-            Nacimiento = request.Nacimiento,
-            Password = request.Password
-        };
-
-        if (service.ObtenerPor(usuario.Email) != null)
-            return Conflict(new { error = "El usuario ya existe." });
-
         try
         {
-            var nuevoUsuario = service.Agregar(usuario);
+            var nuevoUsuario = service.Agregar(
+                request.Nombre,
+                request.Apellido,
+                request.Email,
+                request.Nacimiento,
+                request.Password);
             var response = UsuarioResponse.Desde(nuevoUsuario);
             return CreatedAtAction(nameof(ObtenerPorEmail), new { email = nuevoUsuario.Email }, response);
         }

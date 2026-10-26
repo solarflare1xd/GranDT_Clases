@@ -40,6 +40,15 @@ public class UsuarioService
     }
     public Usuario Agregar(Usuario usuario)
     {
+        usuario.Nombre = usuario.Nombre.Trim();
+        usuario.Apellido = usuario.Apellido.Trim();
+        usuario.Email = usuario.Email.Trim();
+
+        if (usuario.Nacimiento == default || usuario.Nacimiento > DateOnly.FromDateTime(DateTime.UtcNow))
+        {
+            throw new ArgumentException("La fecha de nacimiento debe ser válida y no futura.", nameof(usuario));
+        }
+
         if (!datosval(usuario.Email, usuario.Password))
         {
             throw new Exception("Datos inválidos");
@@ -52,6 +61,23 @@ public class UsuarioService
 
         usuario.Password = BCrypt.Net.BCrypt.HashPassword(usuario.Password);
         return repository.Agregar(usuario);
+    }
+
+    public Usuario Agregar(
+        string nombre,
+        string apellido,
+        string email,
+        DateOnly nacimiento,
+        string password)
+    {
+        return Agregar(new Usuario
+        {
+            Nombre = nombre,
+            Apellido = apellido,
+            Email = email,
+            Nacimiento = nacimiento,
+            Password = password
+        });
     }
 
     public bool Eliminar(string email)

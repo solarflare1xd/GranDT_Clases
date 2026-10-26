@@ -28,6 +28,11 @@ public class EquipoService
         return repository.Agregar(equipo);
     }
 
+    public Equipo Agregar(string nombre)
+    {
+        return repository.Agregar(new Equipo { Nombre = nombre });
+    }
+
     public bool Eliminar(string nombre)
     {
         return repository.Eliminar(nombre);

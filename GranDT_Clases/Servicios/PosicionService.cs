@@ -26,6 +26,11 @@ public class PosicionService
         return repository.Agregar(posicion);
     }
 
+    public Posicion Agregar(string nombre)
+    {
+        return repository.Agregar(new Posicion { Nombre = nombre });
+    }
+
     public bool Eliminar(int id)
     {
         return repository.Eliminar(id);

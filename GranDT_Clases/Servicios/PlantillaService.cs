@@ -1,5 +1,6 @@
 using GranDT_Clases;
 using GranDT_Clases.IRepos;
+using GranDT_Clases.Servicios;
 
 namespace GranDT_Clases.Services;
 
@@ -17,11 +18,16 @@ public class PlantillaService
 
     private readonly IPlantillaRepository repository;
     private readonly IJugadorRepository? jugadorRepository;
+    private readonly UsuarioService? usuarioService;
 
-    public PlantillaService(IPlantillaRepository repository, IJugadorRepository? jugadorRepository = null)
+    public PlantillaService(
+        IPlantillaRepository repository,
+        IJugadorRepository? jugadorRepository = null,
+        UsuarioService? usuarioService = null)
     {
         this.repository = repository;
         this.jugadorRepository = jugadorRepository;
+        this.usuarioService = usuarioService;
     }
 
     public List<Plantilla> ObtenerTodos()
@@ -130,6 +136,15 @@ public class PlantillaService
     }
 
     public Plantilla CrearCompleta(
+        decimal presupuesto,
+        IReadOnlyCollection<int> titulares,
+        IReadOnlyCollection<int> suplentes)
+    {
+        var integrantes = CrearIntegrantes(titulares, suplentes);
+        return CrearCompleta(presupuesto, integrantes);
+    }
+
+    public Plantilla CrearCompleta(
         string email,
         decimal presupuesto,
         IReadOnlyCollection<PlantillaJugador> integrantes)
@@ -171,6 +186,34 @@ public class PlantillaService
 
         ValidarPlantilla(plantilla, integrantes.Count);
         return repository.CrearCompleta(email, plantilla, integrantes);
+    }
+
+    public Plantilla? CrearCompletaParaUsuario(
+        string email,
+        decimal presupuesto,
+        IReadOnlyCollection<int> titulares,
+        IReadOnlyCollection<int> suplentes)
+    {
+        if (usuarioService == null)
+            throw new InvalidOperationException("No está configurada la validación del usuario.");
+
+        if (usuarioService.ObtenerPor(email) == null)
+            return null;
+
+        var nuevaPlantilla = CrearCompleta(email, presupuesto, CrearIntegrantes(titulares, suplentes));
+        return ObtenerCompletaPorId(nuevaPlantilla.IdPlantilla) ?? nuevaPlantilla;
+    }
+
+    public List<Plantilla>? ObtenerTodasDeUsuario(string email)
+    {
+        if (usuarioService == null)
+            throw new InvalidOperationException("No está configurada la validación del usuario.");
+
+        if (usuarioService.ObtenerPor(email) == null)
+            return null;
+
+        var plantilla = ObtenerPorUsuario(email);
+        return plantilla == null ? new List<Plantilla>() : new List<Plantilla> { plantilla };
     }
 
     public decimal PuntajeFecha(Plantilla plantilla, int fecha)
@@ -216,6 +259,26 @@ public class PlantillaService
     {
         return LimitesPorPosicion.All(limite =>
             titulares.Count(jugador => jugador.Posicion?.Nombre == limite.Posicion) <= limite.Maximo);
+    }
+
+    private static List<PlantillaJugador> CrearIntegrantes(
+        IReadOnlyCollection<int> titulares,
+        IReadOnlyCollection<int> suplentes)
+    {
+        return titulares
+            .Select((idJugador, indice) => new PlantillaJugador
+            {
+                IdJugador = idJugador,
+                Numero = indice + 1,
+                EsSuplente = false
+            })
+            .Concat(suplentes.Select((idJugador, indice) => new PlantillaJugador
+            {
+                IdJugador = idJugador,
+                Numero = titulares.Count + indice + 1,
+                EsSuplente = true
+            }))
+            .ToList();
     }
 
     public bool Eliminar(int id)

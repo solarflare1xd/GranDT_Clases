@@ -2,6 +2,8 @@
 using GranDT_Clases;
 using GranDT_Clases.IRepos;
 using GranDT_Clases.Models;
+using GranDT_Clases.Servicios;
+using GranDT_Clases.Services;
 
 namespace GranDT_Clases.Services;
 
@@ -9,13 +11,16 @@ public class PlantillaJugadorService
 {
     private readonly IPlantillaJugadorRepository repository;
     private readonly IJugadorRepository? jugadorRepository;
+    private readonly PlantillaService? plantillaService;
 
     public PlantillaJugadorService(
         IPlantillaJugadorRepository repository,
-        IJugadorRepository? jugadorRepository = null)
+        IJugadorRepository? jugadorRepository = null,
+        PlantillaService? plantillaService = null)
     {
         this.repository = repository;
         this.jugadorRepository = jugadorRepository;
+        this.plantillaService = plantillaService;
     }
 
     public List<PlantillaJugador> ObtenerTodos() => repository.ObtenerTodos();
@@ -25,6 +30,53 @@ public class PlantillaJugadorService
 
     public PlantillaJugador Agregar(PlantillaJugador plantillaJugador) =>
         repository.Agregar(plantillaJugador);
+
+    public PlantillaJugador Agregar(
+        int idPlantilla,
+        int idJugador,
+        int numero,
+        bool esSuplente)
+    {
+        if (idPlantilla <= 0)
+            throw new ArgumentException("El identificador de plantilla debe ser mayor que cero.");
+
+        return repository.Agregar(new PlantillaJugador
+        {
+            IdPlantilla = idPlantilla,
+            IdJugador = idJugador,
+            Numero = numero,
+            EsSuplente = esSuplente
+        });
+    }
+
+    public Plantilla? AgregarAPlantilla(
+        int idPlantilla,
+        int idJugador,
+        int numero,
+        bool esSuplente)
+    {
+        if (plantillaService == null || jugadorRepository == null)
+            throw new InvalidOperationException("No está configurada la validación de la plantilla.");
+
+        var plantilla = plantillaService.ObtenerCompletaPorId(idPlantilla);
+        var futbolista = jugadorRepository.ObtenerPorId(idJugador);
+        if (plantilla == null || futbolista == null)
+            return null;
+
+        if (repository.ObtenerPorId(idPlantilla, idJugador) != null)
+            throw new ResourceConflictException("El futbolista ya pertenece a la plantilla.");
+
+        plantillaService.ValidarAgregarJugador(plantilla, futbolista, esSuplente);
+        repository.Agregar(new PlantillaJugador
+        {
+            IdPlantilla = idPlantilla,
+            IdJugador = idJugador,
+            Numero = numero,
+            EsSuplente = esSuplente
+        });
+
+        return plantillaService.ObtenerCompletaPorId(idPlantilla);
+    }
 
     public PlantillaJugador? ActualizarCondicion(int idPlantilla, int idJugador, bool esSuplente)
     {
