@@ -37,21 +37,35 @@ public class EquipoController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<Equipo> Agregar(CrearEquipoRequest request)
+    public IActionResult Agregar(CrearEquipoRequest request)
     {
-        var nuevoEquipo = service.Agregar(request.Nombre);
+        try
+        {
+            var nuevoEquipo = service.Agregar(request.Nombre);
 
-        return CreatedAtAction(nameof(ObtenerPorNombre), new { nombre = nuevoEquipo.Nombre }, nuevoEquipo);
+            return CreatedAtAction(nameof(ObtenerPorNombre), new { nombre = nuevoEquipo.Nombre }, nuevoEquipo);
+        }
+        catch (Exception error) when (ApiErrors.IsKnown(error))
+        {
+            return ApiErrors.ToActionResult(error);
+        }
     }
 
     [HttpDelete("{nombre}")]
     public IActionResult Eliminar(string nombre)
     {
-        var eliminado = service.Eliminar(nombre);
+        try
+        {
+            var eliminado = service.Eliminar(nombre);
 
-        if (!eliminado)
-            return NotFound();
+            if (!eliminado)
+                return NotFound();
 
-        return NoContent();
+            return NoContent();
+        }
+        catch (Exception error) when (ApiErrors.IsKnown(error))
+        {
+            return ApiErrors.ToActionResult(error);
+        }
     }
 }

@@ -95,9 +95,16 @@ public class PlantillaController : ControllerBase
     [HttpDelete("{id:int}")]
     public IActionResult Eliminar(int id)
     {
-        if (!service.Eliminar(id))
-            return NotFound();
+        try
+        {
+            if (!service.Eliminar(id))
+                return NotFound();
 
-        return NoContent();
+            return NoContent();
+        }
+        catch (Exception error) when (ApiErrors.IsKnown(error))
+        {
+            return ApiErrors.ToActionResult(error);
+        }
     }
 }

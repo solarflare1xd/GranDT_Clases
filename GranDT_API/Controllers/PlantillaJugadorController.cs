@@ -108,18 +108,25 @@ public class PlantillaJugadorController : ControllerBase
 
             return NoContent();
         }
-        catch (ArgumentException error)
+        catch (Exception error) when (ApiErrors.IsKnown(error))
         {
-            return BadRequest(new { error = error.Message });
+            return ApiErrors.ToActionResult(error);
         }
     }
 
     [HttpDelete("{idPlantilla:int}/{idJugador:int}")]
     public IActionResult Eliminar(int idPlantilla, int idJugador)
     {
-        if (!service.Eliminar(idPlantilla, idJugador))
-            return NotFound();
+        try
+        {
+            if (!service.Eliminar(idPlantilla, idJugador))
+                return NotFound();
 
-        return NoContent();
+            return NoContent();
+        }
+        catch (Exception error) when (ApiErrors.IsKnown(error))
+        {
+            return ApiErrors.ToActionResult(error);
+        }
     }
 }

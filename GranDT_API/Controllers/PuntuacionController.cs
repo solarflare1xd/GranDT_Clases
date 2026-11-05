@@ -81,9 +81,16 @@ public class PuntuacionController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Eliminar(string id)
     {
-        if (!service.Eliminar(id))
-            return NotFound();
+        try
+        {
+            if (!service.Eliminar(id))
+                return NotFound();
 
-        return NoContent();
+            return NoContent();
+        }
+        catch (Exception error) when (ApiErrors.IsKnown(error))
+        {
+            return ApiErrors.ToActionResult(error);
+        }
     }
 }

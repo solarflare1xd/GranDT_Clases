@@ -57,9 +57,16 @@ public class UsuarioController : ControllerBase
     [HttpDelete("{email}")]
     public IActionResult Eliminar(string email)
     {
-        if (!service.Eliminar(email))
-            return NotFound();
+        try
+        {
+            if (!service.Eliminar(email))
+                return NotFound();
 
-        return NoContent();
+            return NoContent();
+        }
+        catch (Exception error) when (ApiErrors.IsKnown(error))
+        {
+            return ApiErrors.ToActionResult(error);
+        }
     }
 }

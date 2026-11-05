@@ -34,19 +34,33 @@ public class PosicionController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<Posicion> Agregar(CrearPosicionRequest request)
+    public IActionResult Agregar(CrearPosicionRequest request)
     {
-        var nuevaPosicion = service.Agregar(request.Nombre);
+        try
+        {
+            var nuevaPosicion = service.Agregar(request.Nombre);
 
-        return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevaPosicion.IdPosicion }, nuevaPosicion);
+            return CreatedAtAction(nameof(ObtenerPorId), new { id = nuevaPosicion.IdPosicion }, nuevaPosicion);
+        }
+        catch (Exception error) when (ApiErrors.IsKnown(error))
+        {
+            return ApiErrors.ToActionResult(error);
+        }
     }
 
     [HttpDelete("{id:int}")]
     public IActionResult Eliminar(int id)
     {
-        if (!service.Eliminar(id))
-            return NotFound();
+        try
+        {
+            if (!service.Eliminar(id))
+                return NotFound();
 
-        return NoContent();
+            return NoContent();
+        }
+        catch (Exception error) when (ApiErrors.IsKnown(error))
+        {
+            return ApiErrors.ToActionResult(error);
+        }
     }
 }

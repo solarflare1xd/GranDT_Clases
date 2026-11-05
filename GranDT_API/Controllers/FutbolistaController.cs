@@ -85,10 +85,17 @@ public class FutbolistaController : ControllerBase
     [HttpDelete("{id:int}")]
     public IActionResult Eliminar(int id)
     {
-        if (!jugadorService.Eliminar(id))
-            return NotFound();
+        try
+        {
+            if (!jugadorService.Eliminar(id))
+                return NotFound();
 
-        return NoContent();
+            return NoContent();
+        }
+        catch (Exception error) when (ApiErrors.IsKnown(error))
+        {
+            return ApiErrors.ToActionResult(error);
+        }
     }
 
     private FutbolistaResponse ConEquipo(Futbolista jugador)
