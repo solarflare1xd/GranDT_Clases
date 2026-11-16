@@ -392,3 +392,44 @@ Actualiza la condición de titular o suplente de un futbolista que pertenece a l
 ```
 
 **Errores:** `400` si el valor de `esSuplente` es inválido o no se puede aplicar según las reglas de negocio; `404` si no existe la plantilla o el futbolista no pertenece a ella.
+
+### `GET /api/plantillas/{id}/puntaje?fecha={fecha}`
+
+Consulta el puntaje de los futbolistas titulares de una plantilla para una fecha. Si ningún titular tiene puntuación registrada en esa fecha, el resultado es `0`.
+
+**Entradas:**
+
+- Parámetro de ruta `id` (integer): identificador de la plantilla.
+- Parámetro de consulta `fecha` (integer): fecha del torneo, entre 1 y 49.
+
+**Respuesta `200 OK`:**
+
+```json
+{
+  "idPlantilla": 31,
+  "fecha": 1,
+  "puntaje": 8.5
+}
+```
+
+**Errores:** `400` si la fecha no está entre 1 y 49; `404` si no existe la plantilla.
+
+### `GET /api/plantillas/{id}/validacion`
+
+Indica si la plantilla respeta el presupuesto, el máximo de 20 futbolistas y la formación titular requerida.
+
+**Entradas:** parámetro de ruta `id` (integer), identificador de la plantilla.
+
+**Respuesta `200 OK` para una plantilla válida:**
+
+```json
+{
+  "idPlantilla": 31,
+  "esValida": true,
+  "errores": []
+}
+```
+
+Si no es válida, `esValida` es `false` y `errores` describe las reglas que no cumple.
+
+**Error:** `404` si no existe la plantilla.

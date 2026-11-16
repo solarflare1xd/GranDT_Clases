@@ -146,5 +146,95 @@ namespace GranDT_api.Tests
             Assert.Empty(plantilla.Jugadores_sup);
             Assert.Equal(1, plantilla.IdPlantilla);
         }
+
+        [Fact]
+        public void ObtenerPuntajeFechaSumaTitularesYDevuelveCeroSiNoHayPuntajes()
+        {
+            var repository = new FakePlantillaRepository();
+            repository.Agregar(new Plantilla
+            {
+                IdPlantilla = 1,
+                Presupuesto = 100,
+                Jugadores = new List<Futbolista>
+                {
+                    new()
+                    {
+                        IdJugador = 1,
+                        HistorialPuntajes = new List<Puntuacion>
+                        {
+                            new() { Fecha = 1, Puntaje = 8.5m }
+                        }
+                    },
+                    new() { IdJugador = 2 }
+                },
+                Jugadores_sup = new List<Futbolista>
+                {
+                    new()
+                    {
+                        IdJugador = 3,
+                        HistorialPuntajes = new List<Puntuacion>
+                        {
+                            new() { Fecha = 1, Puntaje = 10 }
+                        }
+                    }
+                }
+            });
+            var service = new PlantillaService(repository);
+
+            Assert.Equal(8.5m, service.ObtenerPuntajeFecha(1, 1)!.Value);
+            Assert.Equal(0m, service.ObtenerPuntajeFecha(1, 2)!.Value);
+            Assert.Null(service.ObtenerPuntajeFecha(999, 1));
+        }
+
+        [Fact]
+        public void ValidarPlantillaInformaFormacionCompletaYPlantillaInexistente()
+        {
+            var repository = new FakePlantillaRepository();
+            var titulares = new[]
+            {
+                "Arquero",
+                "Defensor", "Defensor", "Defensor", "Defensor",
+                "Mediocampista", "Mediocampista", "Mediocampista", "Mediocampista",
+                "Delantero", "Delantero"
+            };
+            repository.Agregar(new Plantilla
+            {
+                IdPlantilla = 1,
+                Presupuesto = 100,
+                CantidadMaximaJugadores = 20,
+                Jugadores = titulares.Select((posicion, indice) => new Futbolista
+                {
+                    IdJugador = indice + 1,
+                    Precio = 1,
+                    Posicion = new Posicion { Nombre = posicion }
+                }).ToList()
+            });
+            repository.Agregar(new Plantilla
+            {
+                IdPlantilla = 2,
+                Presupuesto = 100,
+                CantidadMaximaJugadores = 20,
+                Jugadores = new List<Futbolista>
+                {
+                    new() { IdJugador = 12, Precio = 1, Posicion = new Posicion { Nombre = "Arquero" } }
+                }
+            });
+            var service = new PlantillaService(repository);
+
+            Assert.Empty(service.ObtenerErroresValidacion(1)!);
+            Assert.Contains(
+                service.ObtenerErroresValidacion(2)!,
+                error => error.Contains("exactamente", StringComparison.Ordinal));
+            Assert.Null(service.ObtenerErroresValidacion(999));
+        }
+
+        [Fact]
+        public void ObtenerPuntajeFechaRechazaFechasFueraDelRango()
+        {
+            var service = new PlantillaService(new FakePlantillaRepository());
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => service.ObtenerPuntajeFecha(1, 0));
+            Assert.Throws<ArgumentOutOfRangeException>(() => service.ObtenerPuntajeFecha(1, 50));
+        }
     }
 }

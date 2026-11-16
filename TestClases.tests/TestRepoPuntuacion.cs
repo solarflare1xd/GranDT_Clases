@@ -6,7 +6,7 @@ public class TestRepoPuntuacion : TestRepo
     [Fact]
     public void AltaPuntuacionOK()
     {
-        var idJugador = CrearJugador(CrearPosicion());
+        var idJugador = CrearJugador(ObtenerIdPosicionValida());
         var idPuntuacion = CrearPuntuacion(idJugador);
 
         Assert.Equal(8, ConsultarUno<int>(
@@ -18,7 +18,7 @@ public class TestRepoPuntuacion : TestRepo
     [Fact]
     public void EliminarJugadorEliminaSusPuntuaciones()
     {
-        var idJugador = CrearJugador(CrearPosicion());
+        var idJugador = CrearJugador(ObtenerIdPosicionValida());
         var idPuntuacion = CrearPuntuacion(idJugador);
 
         Ejecutar("sp_EliminarJugador", new { p_IdJugador = idJugador });

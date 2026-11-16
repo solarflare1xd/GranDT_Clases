@@ -4,9 +4,9 @@ namespace GranDT_api.Tests;
 public class TestRepoPosicion : TestRepo
 {
     [Fact]
-    public void AltaPosicionOK()
+    public void ObtenerPosicionValidaOK()
     {
-        var id = CrearPosicion();
+        var id = ObtenerIdPosicionValida();
 
         Assert.NotEqual(0, id);
     }
@@ -14,7 +14,7 @@ public class TestRepoPosicion : TestRepo
     [Fact]
     public void TraerPosicionesOK()
     {
-        var id = CrearPosicion();
+        var id = ObtenerIdPosicionValida();
         var posiciones = Consultar<int>("sp_ObtenerTodasPosiciones");
 
         Assert.Contains(id, posiciones);

@@ -1,5 +1,6 @@
 using GranDT_Clases;
 using GranDT_api.Contracts.Requests;
+using GranDT_api.Contracts.Responses;
 using GranDT_Clases.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,6 +32,37 @@ public class PlantillaController : ControllerBase
             return NotFound();
 
         return Ok(plantilla);
+    }
+
+    [HttpGet("/api/plantillas/{id:int}/puntaje")]
+    public IActionResult ObtenerPuntajeFecha(int id, [FromQuery] int fecha)
+    {
+        try
+        {
+            var puntaje = service.ObtenerPuntajeFecha(id, fecha);
+            return puntaje == null
+                ? NotFound()
+                : Ok(new PuntajePlantillaResponse { IdPlantilla = id, Fecha = fecha, Puntaje = puntaje.Value });
+        }
+        catch (Exception error) when (ApiErrors.IsKnown(error))
+        {
+            return ApiErrors.ToActionResult(error);
+        }
+    }
+
+    [HttpGet("/api/plantillas/{id:int}/validacion")]
+    public IActionResult ValidarPlantilla(int id)
+    {
+        var errores = service.ObtenerErroresValidacion(id);
+        if (errores == null)
+            return NotFound();
+
+        return Ok(new ValidacionPlantillaResponse
+        {
+            IdPlantilla = id,
+            EsValida = errores.Count == 0,
+            Errores = errores
+        });
     }
 
     [HttpGet("usuario/{email}")]

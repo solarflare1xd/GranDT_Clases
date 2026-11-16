@@ -44,9 +44,12 @@ public abstract class TestRepo : IDisposable
         return Interlocked.Increment(ref _secuenciaPruebas).ToString();
     }
 
-    protected int CrearPosicion()
+    protected int ObtenerIdPosicionValida()
     {
-        return ConsultarUno<int>("sp_AgregarPosicion", new { p_Nombre = NuevoIdPrueba() });
+        return ConsultarUno<int>(
+            "SELECT IdPosicion FROM Posicion WHERE Nombre = @Nombre",
+            new { Nombre = "Arquero" },
+            CommandType.Text);
     }
 
     protected int CrearJugador(int idPosicion)

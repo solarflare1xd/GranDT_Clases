@@ -100,6 +100,26 @@ namespace GranDT_Clases.Repositories
                         plantilla.Jugadores.Add(integrante.Futbolista);
                 }
 
+                var puntajes = db.Query<Puntuacion>(
+                    """
+                    SELECT p.IdPuntuacion, p.Fecha, p.Puntaje, p.IdJugador
+                    FROM Puntuacion p
+                    INNER JOIN PlantillaJugador pj ON pj.IdJugador = p.IdJugador
+                    WHERE pj.IdPlantilla = @IdPlantilla
+                    """,
+                    new { IdPlantilla = id }).ToList();
+                var jugadoresPorId = plantilla.Jugadores
+                    .Concat(plantilla.Jugadores_sup)
+                    .ToDictionary(jugador => jugador.IdJugador);
+
+                foreach (var puntaje in puntajes)
+                {
+                    if (jugadoresPorId.TryGetValue(puntaje.IdJugador, out var jugador))
+                    {
+                        jugador.HistorialPuntajes.Add(puntaje);
+                    }
+                }
+
                 return plantilla;
             }
             finally

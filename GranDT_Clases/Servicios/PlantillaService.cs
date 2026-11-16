@@ -218,10 +218,7 @@ public class PlantillaService
 
     public decimal PuntajeFecha(Plantilla plantilla, int fecha)
     {
-        if (fecha is < 1 or >= 50)
-        {
-            throw new ArgumentOutOfRangeException(nameof(fecha), "La fecha debe estar entre 1 y 49.");
-        }
+        ValidarFecha(fecha);
 
         return plantilla.Jugadores
             .SelectMany(jugador => jugador.HistorialPuntajes)
@@ -229,10 +226,43 @@ public class PlantillaService
             .Sum(puntuacion => puntuacion.Puntaje);
     }
 
+    public decimal? ObtenerPuntajeFecha(int idPlantilla, int fecha)
+    {
+        ValidarFecha(fecha);
+
+        var plantilla = repository.ObtenerCompletaPorId(idPlantilla);
+        return plantilla == null ? null : PuntajeFecha(plantilla, fecha);
+    }
+
+    public List<string>? ObtenerErroresValidacion(int idPlantilla)
+    {
+        var plantilla = repository.ObtenerCompletaPorId(idPlantilla);
+        return plantilla == null ? null : ObtenerErroresValidacion(plantilla, exigirFormacionCompleta: true);
+    }
+
     private void ValidarPlantilla(Plantilla plantilla, int cantidadIntegrantes)
+    {
+        var errores = ObtenerErroresValidacion(plantilla, cantidadIntegrantes, exigirFormacionCompleta: false);
+        if (errores.Count > 0)
+        {
+            throw new ArgumentException($"La plantilla no es válida: {string.Join("; ", errores)}.", nameof(plantilla));
+        }
+    }
+
+    private List<string> ObtenerErroresValidacion(Plantilla plantilla, bool exigirFormacionCompleta)
+    {
+        var cantidadIntegrantes = plantilla.Jugadores.Count + plantilla.Jugadores_sup.Count;
+        return ObtenerErroresValidacion(plantilla, cantidadIntegrantes, exigirFormacionCompleta);
+    }
+
+    private List<string> ObtenerErroresValidacion(
+        Plantilla plantilla,
+        int cantidadIntegrantes,
+        bool exigirFormacionCompleta)
     {
         var gasto = ObtenerGasto(plantilla);
         var errores = new List<string>();
+        var integrantes = plantilla.Jugadores.Concat(plantilla.Jugadores_sup).ToList();
 
         if (gasto > plantilla.Presupuesto)
         {
@@ -244,21 +274,36 @@ public class PlantillaService
             errores.Add($"la cantidad supera el máximo de {plantilla.CantidadMaximaJugadores} jugadores");
         }
 
-        if (!TieneFormacionTitularDentroDeLimites(plantilla.Jugadores))
+        if (integrantes.Select(jugador => jugador.IdJugador).Distinct().Count() != integrantes.Count)
         {
-            errores.Add("la plantilla no puede superar 1 arquero, 4 defensores, 4 mediocampistas y 2 delanteros titulares");
+            errores.Add("la plantilla contiene futbolistas duplicados");
         }
 
-        if (errores.Count > 0)
+        if (!TieneFormacionTitularValida(plantilla.Jugadores, exigirFormacionCompleta))
         {
-            throw new ArgumentException($"La plantilla no es válida: {string.Join("; ", errores)}.", nameof(plantilla));
+            errores.Add(exigirFormacionCompleta
+                ? "la formación titular debe tener exactamente 1 arquero, 4 defensores, 4 mediocampistas y 2 delanteros"
+                : "la plantilla no puede superar 1 arquero, 4 defensores, 4 mediocampistas y 2 delanteros titulares");
         }
+
+        return errores;
     }
 
-    private static bool TieneFormacionTitularDentroDeLimites(List<Futbolista> titulares)
+    private static bool TieneFormacionTitularValida(List<Futbolista> titulares, bool exigirFormacionCompleta)
     {
         return LimitesPorPosicion.All(limite =>
-            titulares.Count(jugador => jugador.Posicion?.Nombre == limite.Posicion) <= limite.Maximo);
+        {
+            var cantidad = titulares.Count(jugador => jugador.Posicion?.Nombre == limite.Posicion);
+            return exigirFormacionCompleta ? cantidad == limite.Maximo : cantidad <= limite.Maximo;
+        });
+    }
+
+    private static void ValidarFecha(int fecha)
+    {
+        if (fecha is < 1 or >= 50)
+        {
+            throw new ArgumentOutOfRangeException(nameof(fecha), "La fecha debe estar entre 1 y 49.");
+        }
     }
 
     private static List<PlantillaJugador> CrearIntegrantes(

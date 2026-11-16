@@ -27,7 +27,7 @@ public class TestRepoPlantillaJugador : TestRepo
     private (int IdPlantilla, int IdJugador) CrearPlantillaJugador()
     {
         var idPlantilla = ConsultarUno<int>("sp_AgregarPlantilla", new { p_Presupuesto = 100m });
-        var idJugador = CrearJugador(CrearPosicion());
+        var idJugador = CrearJugador(ObtenerIdPosicionValida());
         Ejecutar("sp_AgregarPlantillaJugador", new
         {
             p_IdPlantilla = idPlantilla,

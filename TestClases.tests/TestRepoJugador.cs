@@ -6,7 +6,7 @@ public class TestRepoJugador : TestRepo
     [Fact]
     public void AltaJugadorOK()
     {
-        var idPosicion = CrearPosicion();
+        var idPosicion = ObtenerIdPosicionValida();
         var idJugador = CrearJugador(idPosicion);
 
         Assert.Equal(idJugador, ConsultarUno<int>(
@@ -17,7 +17,7 @@ public class TestRepoJugador : TestRepo
     [Fact]
     public void TraerJugadoresOK()
     {
-        var idJugador = CrearJugador(CrearPosicion());
+        var idJugador = CrearJugador(ObtenerIdPosicionValida());
 
         Assert.Contains(idJugador, Consultar<int>("sp_ObtenerTodosJugadores"));
     }
